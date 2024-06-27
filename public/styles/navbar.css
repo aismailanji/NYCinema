@@ -1,0 +1,20 @@
+.navbar {
+    background-color: #DFD2CE !important;
+}
+
+.nav-link {
+    color: #758BFD !important;
+}
+
+.navbar-brand {
+    color: #342C63 !important;
+}
+
+#login {
+    cursor: pointer;
+    border: 1px solid #251f47;
+    border-radius: 5px;
+    color: #758BFD;
+    background-color: #f8f9FA;
+    width: 150px;
+}
