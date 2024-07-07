@@ -1,5 +1,7 @@
 .navbar {
     background-color: #DFD2CE !important;
+    border-bottom: 1px solid #342C63;
+    top: 0;
 }
 
 .nav-link {
@@ -18,3 +20,4 @@
     background-color: #f8f9FA;
     width: 150px;
 }
+
