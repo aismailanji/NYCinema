@@ -3,5 +3,11 @@
 }
 
 body {
-    background-color: #fcfcfc !important;
+    background-color: #EAE8ED !important;
+    margin: 0;
+    padding: 0;
+}
+
+body.homepage {
+    background-color: #f8f9FA !important;
 }

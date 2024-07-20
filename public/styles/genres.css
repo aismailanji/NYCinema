@@ -3,3 +3,9 @@
     border-radius: 15px;
     box-shadow: 0 0 30px rgba(0,0,0,0.15) !important;
 }
+
+body {
+    background-color: #EAE8ED !important;
+    margin: 0;
+    padding: 0;
+}

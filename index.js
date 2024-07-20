@@ -9,6 +9,7 @@ let app = express();
 let port = 3000;
 const saltRounds = 10;
 
+/*
 // this is for the database will uncomment once the sharing ability is figured out
 const db = new pg.Client({
     user: "postgres",
@@ -18,6 +19,7 @@ const db = new pg.Client({
     port: 5433,
 });
 db.connect();
+*/
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:true}));
@@ -29,8 +31,8 @@ app.get("/", (req,res) => {
     res.render("index.ejs");
 });
 
-app.get("/theaters", (req,res) => {
-    res.render("theaters.ejs");
+app.get("/generate_plan", (req,res) => {
+    res.render("generate_plan.ejs");
 });
 
 app.get("/genres", (req,res) => {
