@@ -27,10 +27,10 @@
 
         <h3>Simple Demo of how Events will be generated</h3>
 
-        <div class="eventsdemobox">
+        <div class="eventsdemobox active">
             <form action="/submit-event-demo" method="POST" class="eventsdemo" id="eventdemo">
-                <input type="date" name="sdate" placeholder="Start Date" class="input" required>
-                <input list="boroughs" name="borough" placeholder="Borough" class="input" required>
+                <input id="sdate" type="date" name="sdate" placeholder="Start Date" class="input" required>
+                <input id="borough" list="boroughs" name="borough" placeholder="Borough" class="input" required>
                 <datalist id="boroughs">
                     <option>Brooklyn</option>
                     <option>Bronx</option>
@@ -38,20 +38,32 @@
                     <option>Staten Island</option>
                     <option>Queens</option>
                 </datalist>
-                <input type="number" maxlength="5" name="zipcode" placeholder="Zip Code" class="input" required>
+                <input id="zipcode" type="number" maxlength="5" name="zipcode" placeholder="Zip Code" class="input" required>
                 <input type="submit" value="Submit" class="eventssub">
             </form>
         </div>
 
         <div class="eventsdiv1">
-            <div class="eventsdiv2">Event 1</div>
-            <div class="eventsdiv2">Event 2 </div>
-            <div class="eventsdiv2">Event 3</div>
+            <div class="eventsdiv2 event1"></div>
+            <div class="eventsdiv2 event2"></div>
+            <div class="eventsdiv2 event3"></div>
         </div>
+
+        <div class="resetbox">
+            <form action="/submit-event-retry" method="POST" class="reset">
+                <input type="submit" value="Reset" class="resetbtn">
+            </form>
+
+        </div>
+
+
     </p>
 
 
     </div>
+
+    <div style="height: 40px; margin-bottom: 20px; width: 100%;"> </div>
+</body>
 
 
 

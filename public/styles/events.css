@@ -1,8 +1,12 @@
-.eventsdiv1 {
+.eventsdiv1.active {
     display: flex;
     justify-content:space-around;
     align-content: center;
     margin: 10px;
+}
+
+.eventsdiv1{
+    display: none;
 }
 
 .eventsdiv2 {
@@ -11,15 +15,19 @@
     background: yellowgreen;
     border: 5px solid green;
     padding: 5px;
-    /* display: none; */
 }
 
-.eventsdemobox {
+.eventsdemobox.active {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     /* height: 190px; */
 }
+
+.eventsdemobox {
+    display: none;
+}
+
 
 .eventsdemobox input{
     margin: 6px;
@@ -36,4 +44,14 @@
 .eventssub {
     background: #f8f9FA;
     color: #E27396;
+}
+
+.resetbox {
+    display: none;
+
+}
+
+.resetbox.active{
+    display: flex;
+    justify-content: center;
 }

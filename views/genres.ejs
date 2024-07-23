@@ -1,9 +1,9 @@
 <%- include('partials/header.ejs') %>
-<body>
+<body style="margin-bottom: 40px;">
     <%- include('partials/navbar.ejs') %>
 
-    <div class="container my-5" style="padding-bottom: 50px;">
-        <h1 class="text-center mb-4" style="margin-top: 50px;">What genre are you in the mood for?</h1>
+    <div class="container my-5">
+        <h1 class="text-center mb-4" style="margin-top: 20px;">What genre are you in the mood for?</h1>
         <div class="row justify-content-center">
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
@@ -62,7 +62,7 @@
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
                     <img src="..." class="card-img-top" alt="Other Genre Image">
-                    <div class="card-body">
+                    <div class="card-body divmargbot">
                         <h5 class="card-title">Genre</h5>
                         <p class="card-text">Description.</p>
                     </div>
@@ -70,10 +70,11 @@
             </div>
             <!-- add more genres as needed -->
         </div>
+        <div style="height: 40px; margin-bottom: 20px; width: 100%;"> </div>
+
     </div>
 
-    <%- include('partials/register.ejs') %>
 
+
+    <%- include('partials/register.ejs') %>
     <%- include('partials/footer.ejs') %>
-</body>
-</html>

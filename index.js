@@ -171,8 +171,13 @@ function generateRefreshToken(user) {
     return jwt.sign(user, REFRESH_TOKEN_SECRET, { expiresIn: '3m' });
 }
 
-app.post('/submiteventdemo', (req, res) => { 
+app.post('/submiteventdemo', async(req, res) => { 
     
+    const date = req.body.sdate;
+    const borough = req.body.borough;
+    const zipcode = req.body.zipdcode;
+    res.json({ event1: "This is Event 1", event2: "This is Event 2", event3: "This is Event 3"});
+
 });
 
 app.listen(port, () => {

@@ -2,11 +2,11 @@
     margin-right: 15px;
 }
 
-#footer {
+#footerhome {
     position: fixed;
     bottom: 0 !important;
     width: 100%;
-    background-color: #EAE8ED;
+    background-color: #f8f9FA;
     z-index: 10;
     margin-bottom: 0px !important; 
     margin-top: 45px !important;

@@ -44,7 +44,42 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    const login_sub = document.querySelector('.login-submit')
+    const eventdemo = document.querySelector('.eventsdemo')
+    eventdemo.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        try {
+            const response = await fetch('/submiteventdemo', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            });
+            const data = await response.json();
+            // here you would have to check for and error when recveing data like no events found
+            document.querySelector('.eventsdiv1').classList.add("active");
+            document.querySelector('.resetbox').classList.add("active");
+            document.querySelector('.eventsdemobox').classList.remove("active");
+
+            document.querySelector('.event1').textContent = data.event1;
+            document.querySelector('.event2').textContent = data.event2;
+            document.querySelector('.event3').textContent = data.event3;
+
+
+
+        } catch(error) {
+            console.error('Error:',error);
+        }
+    });
+
+    const reseteventdemo = document.querySelector('.reset')
+    reseteventdemo.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        document.querySelector('.eventsdiv1').classList.remove("active");
+        document.querySelector('.resetbox').classList.remove("active");
+        document.querySelector('.eventsdemobox').classList.add("active");
+    });
+
+    const login_sub = document.querySelector('.login-submit');
     login_sub.addEventListener('submit', async function(event) {
         event.preventDefault();
         const form = event.target;

@@ -11,3 +11,11 @@ body {
 body.homepage {
     background-color: #f8f9FA !important;
 }
+
+.divmargtop {
+    margin-top: 65px !important;   
+}
+
+.divmargbot {
+    margin-bottom: 120px !important;
+}
