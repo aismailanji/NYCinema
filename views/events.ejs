@@ -8,8 +8,49 @@
     <p>
         Given your input, out website will look around the location of your choosen theater and generate an itenary with things around the sorrounding area.
         
-        
+        <br>
+        <br>
+    
+
+        The API we will be using is a NYC gov API that will find events in the NYC area given 
+        some of the following parameters having to do with time and location. (The ones bolded are going to be required)
+
+        <ul>
+            <li><strong>Start Date</strong></li>
+            <li>Borough</li>
+            <li><strong>Zip Code</strong></li>
+        </ul>
+
+        Not all of these parameters are necessary but they will aid in creating a 
+        more timely organized itenary.
+
+
+        <h3>Simple Demo of how Events will be generated</h3>
+
+        <div class="eventsdemobox">
+            <form action="/submit-event-demo" method="POST" class="eventsdemo" id="eventdemo">
+                <input type="date" name="sdate" placeholder="Start Date" class="input" required>
+                <input list="boroughs" name="borough" placeholder="Borough" class="input" required>
+                <datalist id="boroughs">
+                    <option>Brooklyn</option>
+                    <option>Bronx</option>
+                    <option>Manhattan</option>
+                    <option>Staten Island</option>
+                    <option>Queens</option>
+                </datalist>
+                <input type="number" maxlength="5" name="zipcode" placeholder="Zip Code" class="input" required>
+                <input type="submit" value="Submit" class="eventssub">
+            </form>
+        </div>
+
+        <div class="eventsdiv1">
+            <div class="eventsdiv2">Event 1</div>
+            <div class="eventsdiv2">Event 2 </div>
+            <div class="eventsdiv2">Event 3</div>
+        </div>
     </p>
+
+
     </div>
 
 

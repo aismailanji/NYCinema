@@ -1,0 +1,39 @@
+.eventsdiv1 {
+    display: flex;
+    justify-content:space-around;
+    align-content: center;
+    margin: 10px;
+}
+
+.eventsdiv2 {
+    height: 160px;
+    width: 160px;
+    background: yellowgreen;
+    border: 5px solid green;
+    padding: 5px;
+    /* display: none; */
+}
+
+.eventsdemobox {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    /* height: 190px; */
+}
+
+.eventsdemobox input{
+    margin: 6px;
+    border-radius: 5px;
+    border: 1px solid #251f47;
+}
+
+.eventsdemo {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+}
+
+.eventssub {
+    background: #f8f9FA;
+    color: #E27396;
+}

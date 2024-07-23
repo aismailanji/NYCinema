@@ -56,25 +56,74 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             const data = await response.json();
-            if(data.accountExists == true) {
+            console.log(data);
+            // if(data.accountExists == true) {
+            
+            if(data.access_token) {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('refresh_token', data.refresh_token);
                 wrap.classList.remove("active-popup");
-                document.querySelector('#login').style.width = "110px";
                 document.querySelector('#login').textContent = "My Account";
+                setTimeout(() => {
+                    refreshToken(); 
+                }, 15000);
             }
             else {
-            const result = data.msg;
-            document.querySelector('.msg').textContent = result;
-            document.querySelector('.msg').classList.add("active");
+                const result = data.msg;    
+                document.querySelector('.msg').textContent = result;
+                document.querySelector('.msg').classList.add("active");
             }
         } catch (error) {
             console.error('Error:', error);
         }
     });
 
-
     if (localStorage.getItem('isLoggedIn') === 'true') {
-        document.querySelector('#login').style.width = "110px";
         document.querySelector('#login').textContent = "My Account";
+        wrap.classList.remove("active-popup");
+
+        refreshToken();
+    }
+    else {
+        document.querySelector('#login').textContent = "Sign in/Sign Up";
+        wrap.classList.remove("active-popup");
+    };
+
+    function refreshToken() {
+        const accessToken = localStorage.getItem('access_token');
+        if (accessToken) {
+            fetch('/refresh_token', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ token: refreshToken })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access_token) {
+                    localStorage.setItem('access_token', data.access_token);
+                    setTimeout(() => {
+                        refreshToken();
+                    }, 45000); // Refresh token again after 45 seconds for testing
+                } else {
+                    logout();
+                }
+            })
+            .catch(error => {
+                console.error('Error refreshing token:', error);
+                logout();
+            });
+        } else {
+            logout();
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('access_token');
+        document.querySelector('#login').textContent = "Sign in/Sign Up";
         wrap.classList.remove("active-popup");
     }
 });
