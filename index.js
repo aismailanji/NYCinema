@@ -168,11 +168,10 @@ function generateAccessToken(user) {
 }
 
 function generateRefreshToken(user) {
-    return jwt.sign(user, REFRESH_TOKEN_SECRET, { expiresIn: '3m' });
+    return jwt.sign(user, REFRESH_TOKEN_SECRET, { expiresIn: '1m' });
 }
 
 app.post('/submiteventdemo', async(req, res) => { 
-    
     const date = req.body.sdate;
     const borough = req.body.borough;
     const zipcode = req.body.zipdcode;

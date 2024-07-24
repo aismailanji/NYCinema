@@ -44,6 +44,41 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    const login_sub = document.querySelector('.login-submit');
+    login_sub.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            });
+
+            const data = await response.json();
+            console.log(data);
+            // if(data.accountExists == true) {
+            
+            if(data.access_token) {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('refresh_token', data.refresh_token);
+                wrap.classList.remove("active-popup");
+                document.querySelector('#login').textContent = "My Account";
+                setTimeout(() => {
+                    refreshToken(); 
+                }, 45000);
+            }
+            else {
+                const result = data.msg;    
+                document.querySelector('.msg').textContent = result;
+                document.querySelector('.msg').classList.add("active");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
     const eventdemo = document.querySelector('.eventsdemo')
     eventdemo.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -79,40 +114,6 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelector('.eventsdemobox').classList.add("active");
     });
 
-    const login_sub = document.querySelector('.login-submit');
-    login_sub.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                body: new URLSearchParams(formData)
-            });
-
-            const data = await response.json();
-            console.log(data);
-            // if(data.accountExists == true) {
-            
-            if(data.access_token) {
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('refresh_token', data.refresh_token);
-                wrap.classList.remove("active-popup");
-                document.querySelector('#login').textContent = "My Account";
-                setTimeout(() => {
-                    refreshToken(); 
-                }, 15000);
-            }
-            else {
-                const result = data.msg;    
-                document.querySelector('.msg').textContent = result;
-                document.querySelector('.msg').classList.add("active");
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
 
     if (localStorage.getItem('isLoggedIn') === 'true') {
         document.querySelector('#login').textContent = "My Account";
