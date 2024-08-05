@@ -40,6 +40,22 @@ app.get("/generate_plan", (req,res) => {
     res.render("generate_plan.ejs");
 });
 
+app.get("/generate_plan_2", (req,res) => {
+    res.render("multipage/generate_plan_2.ejs");
+});
+
+app.get("/generate_plan_3", (req,res) => {
+    res.render("multipage/generate_plan_3.ejs");
+});
+
+app.get("/generate_plan_4", (req,res) => {
+    res.render("multipage/generate_plan_4.ejs");
+});
+
+app.get("/generate_plan_5", (req,res) => {
+    res.render("multipage/generate_plan_5.ejs");
+});
+
 app.get("/movies", (req,res) => {
     res.render("movies.ejs");
 });
@@ -171,12 +187,85 @@ function generateRefreshToken(user) {
     return jwt.sign(user, REFRESH_TOKEN_SECRET, { expiresIn: '1m' });
 }
 
+// Helper function to format date in MM/dd/yyyy hh:mm aa format
+function formatDateForAPI(dateStr, time) {
+    const date = new Date(dateStr);
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${month}/${day}/${year} ${time}`;
+}
+
 app.post('/submiteventdemo', async(req, res) => { 
     const date = req.body.sdate;
     const borough = req.body.borough;
-    const zipcode = req.body.zipdcode;
-    res.json({ event1: "This is Event 1", event2: "This is Event 2", event3: "This is Event 3"});
+    const zipcode = req.body.zipcode;
+    //res.json({ event1: "This is Event 1", event2: "This is Event 2", event3: "This is Event 3"});
 
+    if (!date || !borough || !zipcode) {
+        return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    //console.log(`Received parameters: date=${date}, borough=${borough}, zipcode=${zipcode}`);
+    
+    // Normalize borough input to match API expected values
+    const boroughMap = {
+        'Brooklyn': 'Bk',
+        'Bronx': 'Bx',
+        'Manhattan': 'Mn',
+        'Staten Island': 'Si',
+        'Queens': 'Qn'
+    };
+    const boroughCode = boroughMap[borough] || 'Bk'; // Default to Brooklyn if unknown
+
+    // Format the date to MM/dd/yyyy hh:mm aa format
+    // const formattedDate = formatDateForAPI(date);
+
+    // Format the start and end dates
+    //const startDate = formatDateForAPI(date, '12:00 AM');
+    //const endDate = formatDateForAPI(date, '11:59 PM');
+
+    // Create a Date object for the start date
+    const startDateObj = new Date(date);
+    
+    // Format the start date
+    const startDate = formatDateForAPI(startDateObj, '12:00 AM');
+
+    // Add 7 days to the start date to get the end date
+    const endDateObj = new Date(startDateObj);
+    endDateObj.setDate(startDateObj.getDate() + 7);
+    
+    // Format the end date
+    const endDate = formatDateForAPI(endDateObj, '11:59 PM');
+
+    console.log(`Received formatted parameters: start date=${startDate}, end date=${endDate}, borough=${boroughCode}, zipcode=${zipcode}`);
+    
+    // Construct the API URL with input parameters
+    // correct url format example https://api.nyc.gov/calendar/search?startDate=07%2F24%2F2024%2012:00%20AM&endDate=07%2F24%2F2024%2011:59%20PM&boroughs=Bk&zip=11220&sort=DATE
+    const url = `https://api.nyc.gov/calendar/search?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&boroughs=${boroughCode}&zip=${zipcode}&sort=DATE`;
+    const headers = {
+        'Cache-Control': 'no-cache',
+        'Ocp-Apim-Subscription-Key': process.env.NYC_EVENTS_API_KEY,
+    };
+
+    try {
+        const response = await fetch(url, { method: 'GET', headers });
+        if (!response.ok) {
+            throw new Error(`Error fetching events: ${response.statusText}`);
+        }
+        const events = await response.json();
+        
+        // Return the items array
+        if (events.items) {
+            res.json(events.items);
+        } else {
+            res.json([]); // Return an empty array if no items are found
+        }
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).json({ error: 'Failed to fetch events' });
+    }
 });
 
 app.listen(port, () => {

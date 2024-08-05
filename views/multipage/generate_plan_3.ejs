@@ -1,0 +1,56 @@
+<%- include('../partials/header.ejs') %>
+<body>
+    <%- include('../partials/navbar.ejs') %>
+
+
+    
+    <div class="container " style="height: 10px;">
+        <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
+        </div>
+        <div class="outcomes">
+          <h5>Enter your event recommendation preferences</h5>
+          <div class="eventsdemobox active">
+            <form action="/submit-event-demo" method="POST" class="eventsdemo" id="eventdemo">
+                <input id="sdate" type="date" name="sdate" placeholder="Start Date" class="input" required>
+                <input id="borough" list="boroughs" name="borough" placeholder="Borough" class="input" required>
+                <datalist id="boroughs">
+                    <option>Brooklyn</option>
+                    <option>Bronx</option>
+                    <option>Manhattan</option>
+                    <option>Staten Island</option>
+                    <option>Queens</option>
+                </datalist>
+                <input id="zipcode" type="number" maxlength="5" name="zipcode" placeholder="Zip Code" class="input" required>
+                <input type="submit" value="Submit" class="eventssub">
+            </form>
+          </div>
+    
+          <div class="eventsdiv1">
+              <div class="eventsdiv2 event1"></div>
+              <div class="eventsdiv2 event2"></div>
+              <div class="eventsdiv2 event3"></div>
+          </div>
+    
+          <div class="resetbox">
+              <form action="/submit-event-retry" method="POST" class="reset">
+                  <input type="submit" value="Reset" class="resetbtn">
+              </form>
+          </div>
+        
+        <button id="nextPage" class="submit" type="button" style="margin-top: 65px;">Continue!</button> 
+      </div>
+  
+      <div class="container" style="height: 10px;">
+          
+    </div>
+
+    <%- include('../partials/register.ejs') %>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <script>
+      document.getElementById('nextPage').addEventListener('click', function() {
+        window.location.href = '/generate_plan_4';
+      });
+  </script>
+</body>

@@ -1,0 +1,41 @@
+<%- include('../partials/header.ejs') %>
+<body>
+    <%- include('../partials/navbar.ejs') %>
+
+    <div class="container" style="height: 10px;">
+        <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
+      </div>
+      <div class="outcomes">
+        <label for="activity">Here is your plan for the day out in NYC!</label>
+        <div class="energy">
+          <div class="something">
+            <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
+            <h4 style="text-align: center; margin: auto;">Movie</h4>
+          </div>
+  
+          <h1>&#8594;</h1>
+  
+          <div class="something">
+            <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
+            <h4 style="text-align: center; margin: auto;">Activity</h4>
+          </div>
+        </div>
+        <button id="nextPage" class="submit" type="button" style="margin: auto; padding: 10px 24px;">Save to my profile</button>
+      </div>
+  
+      <div class="container" style="height: 10px;">
+          
+      </div>
+
+    <%- include('../partials/register.ejs') %>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <script>
+      document.getElementById('nextPage').addEventListener('click', function() {
+        sessionStorage.setItem('success', 'true');
+        window.location.href = '/';
+      });
+    </script>
+
+</body>

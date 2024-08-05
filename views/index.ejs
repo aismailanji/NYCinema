@@ -9,10 +9,10 @@
           <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
         </div>
         <div class="col-lg-6">
-          <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3" style="font-family: Inter;" >Welcome to NYCinema</h1>
+          <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3" style="font-family: Inter; text-align: center;" >Welcome to NYCinema</h1>
           <p  style="font-family: Libre Franklin;" class="lead">To bring life back to the cinemas and in general to have people experience all of what NYC has to offer, we plan to create a website or web application that will recommend a movie currently being shown in theaters to the user along with some type of activity in NYC to go along with it. </p>
           <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-            <button type="button" style="background-color: #758bfd;" class="btn btn-primary btn-lg px-4 me-md-2">Generate A Plan</button>
+            <button id="generatePlanButton" type="button" style="background-color: #758bfd;" class="btn btn-primary btn-lg px-4 me-md-2">Generate A Plan</button>
           </div>
         </div>
       </div>
@@ -67,5 +67,18 @@
 
     <%- include('partials/register.ejs') %>
     <%- include('partials/footerhome.ejs') %>
+  <script>
+      document.getElementById('generatePlanButton').addEventListener('click', function() {
+        window.location.href = '/generate_plan';
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        if (sessionStorage.getItem('success') === 'true') {
+          alert('Successfully added to your account');
+          sessionStorage.removeItem('success');
+        }
+      });
+  </script>
+</body>
 
    
