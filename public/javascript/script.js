@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const login_btn = document.getElementById("login");
-
     const wrap = document.querySelector(".wrap");
 
     const register = document.querySelector(".register-link");
@@ -15,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelector(".msg").classList.remove("active");
     });
 
+    const login_btn = document.getElementById("login");
     login_btn_text = login_btn.textContent;
     login_btn.addEventListener("click", ()=> {
         if(login_btn_text == 'Sign-in/Sign-up') {
@@ -142,82 +141,16 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelector('.eventsdemobox').classList.add("active");
     });
 
-    const moviedemo = document.querySelector('.moviesdemo');
-    moviedemo.addEventListener('submit', async function(event) {
-        event.preventDefault();
+    const logoutbtn = document.getElementById("logout");
+    logoutbtn.addEventListener('click', () => {
+        console.log("btn clicked for logout")
         try {
-            const response = await fetch(`/api/movies?postalcode=${postalCode}`);
-            const data = await response.json();
-            displayMovies(data);
+            fetch('/logout', {
+                method: 'GET',
+            });
         } catch (error) {
-            console.error('Error fetching movies:', error);
+            console.error('Error:', error);
         }
     });
 
-    function displayMovies(movies) {
-        movies.forEach(movie => {
-            const movieElement = document.querySelector('.moviesdiv2 .event1');
-            movieElement.className = 'movie';
-            movieElement.innerHTML = `
-                <h2>${movie.title}</h2>
-                <img src="${movie.poster}" alt="${movie.title} Poster">
-                <p>Year: ${movie.year}</p>
-                <p>Runtime: ${movie.runtime} minutes</p>
-            `;
-            moviesContainer.appendChild(movieElement);
-        });
-    }
-
-
-    $(document).ready(function() {
-        const query = "Gone with the Wind"; // or retrieve from input field
-        $.ajax({
-            url: '/api/movies',
-            data: { query: query },
-            success: searchCallback,
-            error: function(xhr, status, error) {
-                console.error('Error fetching movies:', error);
-            }
-        });
-    });
-
-    function searchCallback(data) {
-        $(document.body).append('Found ' + data.total + ' results for ' + query);
-        var movies = data.movies;
-        $.each(movies, function(index, movie) {
-            $(document.body).append('<h1>' + movie.title + '</h1>');
-            $(document.body).append('<img src="' + movie.posters.thumbnail + '" />');
-        });
-    }
-
-    const logoutbtn = document.getElementById("logout");
-    logoutbtn.addEventListener('click', () => {
-        alert("h1llo");
-        // console.log("btn clicked for logout")
-        // try {
-        //     fetch('/logout', {
-        //         method: 'GET',
-        //     });
-        // } catch (error) {
-        //     console.error('Error:', error);
-        // }
-    });
-
-    // document.body.addEventListener('click', function(event) {
-    //     if (event.target.id === 'logout') { // Check if the clicked element is the logout button
-    //         alert('clicked');
-    //         try {
-    //             fetch('/logout', {
-    //                 method: 'GET',
-    //             }).then(response => {
-    //                 if (response.redirected) {
-    //                     window.location.href = response.url; // Redirect if the response asks to
-    //                 }
-    //             });
-    //         } catch (error) {
-    //             console.error('Error:', error);
-    //         }
-    //     }
-    // });
 });
-
