@@ -92,16 +92,41 @@ document.addEventListener("DOMContentLoaded", function() {
                 method: 'POST',
                 body: new URLSearchParams(formData)
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
             const data = await response.json();
             // here you would have to check for and error when recveing data like no events found
+
+            console.log('Received data:', data); // Log the response to inspect its format
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
             document.querySelector('.eventsdiv1').classList.add("active");
             document.querySelector('.resetbox').classList.add("active");
             document.querySelector('.eventsdemobox').classList.remove("active");
 
-            document.querySelector('.event1').textContent = data.event1;
-            document.querySelector('.event2').textContent = data.event2;
-            document.querySelector('.event3').textContent = data.event3;
-
+            const eventContainer = document.querySelector('.eventsdiv1');
+            eventContainer.innerHTML = ''; // Clear previous events
+    
+            if (Array.isArray(data)) {
+                const eventContainer = document.querySelector('.eventsdiv1');
+                eventContainer.innerHTML = ''; // Clear previous events
+    
+                data.forEach((event, index) => {
+                    if (index < 3) { // Display only the first three events
+                        const eventElement = document.createElement('div');
+                        eventElement.classList.add(`event${index + 1}`);
+                        eventElement.textContent = `Event ${index + 1}: ${event.name}`;
+                        eventContainer.appendChild(eventElement);
+                    }
+                });
+            } else {
+                console.error('Expected array but got:', data);
+            }
 
 
         } catch(error) {
