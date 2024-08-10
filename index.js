@@ -1,20 +1,27 @@
-import express from "express";
+import express, { response } from "express";
+import session from "express-session";
 import axios from "axios";
 import bodyParser from "body-parser";
 import pg from "pg";
 import bcrypt from "bcrypt";
-import * as cheerio from 'cheerio';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import crypto from "crypto";
+import mongoose from "mongoose";
+import { cookie } from "express-validator";
+import cookieParser from "cookie-parser";
+import cheerio from 'cheerio';
 
 
 dotenv.config();
-const { URI, PORT, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env;
-export{URI, PORT, ACCESS_TOKEN_SECRET};
+const { URI, PORT, SECRET_KEY, FNDG_API_KEY,FNDG_API_SEC} = process.env;
+export{URI, PORT, SECRET_KEY};
 
 let app = express();
 let port = 3000;
 const saltRounds = 10;
+
+
 
 // this is for the database will uncomment once the sharing ability is figured out
 const db = new pg.Client({
@@ -24,36 +31,76 @@ const db = new pg.Client({
     password: "hello123",
     port: 5432,
 });
-db.connect();
+// db.connect();
+db.connect(err => {
+    if (err) {
+        console.error('Connection error', err.stack);
+    } else {
+        console.log('Connected to database');
+    }
+});
+
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json()); 
+app.use(cookieParser());
 app.set('view engine', 'ejs');
 
 
 app.get("/", (req,res) => {
-    res.render("index.ejs");
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+    res.render("index.ejs",{url});
+
 });
 
 app.get("/generate_plan", (req,res) => {
-    res.render("generate_plan.ejs");
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("generate_plan.ejs",{url});
 });
 
 app.get("/movies", (req,res) => {
-    res.render("movies.ejs");
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("movies.ejs",{url});
 });
 
 app.get("/genres", (req,res) => {
-    res.render("genres.ejs");
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("genres.ejs",{url});
 });
 
 app.get("/events", (req,res) => {
-    res.render("events.ejs");
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("events.ejs",{url});
 });
 
 app.get("/about", (req,res) => {
-    res.render("about.ejs");
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("about.ejs",{url});
+});
+
+app.get("/myaccount", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+    res.render("myaccount.ejs",{url});
 });
 
 app.post("/register", async (req,res) => {
@@ -107,12 +154,12 @@ app.post("/login", async (req,res) => {
                     console.error("Error comparing passwords: ", err);
                 }
                 else {
-                    if(result) {
-                        console.log("Account found and password correct.");
-                        const access_token = generateAccessToken(user);
-                        const refresh_token = generateRefreshToken(user);
-                        res.json({access_token: access_token, refresh_token: refresh_token});
-                        // this can be changed depending on what we want the user to see after logging in.
+                    if (result) {
+                        res.cookie('authToken', SECRET_KEY, { httpOnly: true, secure: true });
+                        console.log("login sucessfull");
+                        const url = "<button id='login'><a href='/myaccount'>My Account</a></button>";
+                        // res.cookie('loggedIn', 'true', { maxAge: 240000, httpOnly: true }); // 3 days
+                        res.json({login: true, url});
                     }
                     else {
                         let fakePass = `$2b$$10$ifgfgfgfgfgfgfggfgfgfggggfgfgfga`;
@@ -132,6 +179,13 @@ app.post("/login", async (req,res) => {
     }
 });
 
+app.get('/logout', (req,res) => {
+    res.clearCookie('authToken');
+    const url = "<button id='login'>Sign-in/Sign-up</button>";
+    res.render("index.ejs",{url});
+})
+
+// Token Refresh Route
 app.post('/token', (req, res) => {
     const refreshToken = req.body.token;
     if (refreshToken == null) return res.sendStatus(401);
@@ -142,35 +196,6 @@ app.post('/token', (req, res) => {
     });
 });
 
-app.post('/refresh_token', (req, res) => {
-    const refreshToken = req.body.token;
-    if (refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        const accessToken = generateAccessToken({ email: user.email });
-        res.json({ accessToken: accessToken });
-    });
-});
-
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    if (token == null) return res.sendStatus(401);
-    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
-}
-
-function generateAccessToken(user) {
-    return jwt.sign(user, ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
-}
-
-function generateRefreshToken(user) {
-    return jwt.sign(user, REFRESH_TOKEN_SECRET, { expiresIn: '1m' });
-}
-
 app.post('/submiteventdemo', async(req, res) => { 
     const date = req.body.sdate;
     const borough = req.body.borough;
@@ -179,6 +204,35 @@ app.post('/submiteventdemo', async(req, res) => {
 
 });
 
+app.get('/api/movies', async (req, res) => {
+    const { mzipcode } = req.query;
+    try {
+        // Define the parameters
+        const operation = 'moviesbypostalcodesearch';
+        const parameters = `op=${operation}&postalcode=${mzipcode}`;
+        const apiKey = FNDG_API_KEY;
+        const sharedSecret = FNDG_API_SEC;
+
+        // Generate the signature
+        const sig = crypto.createHmac('sha1', sharedSecret)
+                          .update(parameters)
+                          .digest('hex');
+
+        // Form the full request URL
+        const url = `http://api.fandango.com/v1?${parameters}&apikey=${apiKey}&sig=${sig}`;
+
+        // Make the API request
+        const response = await axios.get(url);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Error fetching movies:', error);
+        res.status(500).json({ error: 'Failed to fetch movies' });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
+}
+).on('error', (err) => {
+    console.error('Error starting server:', err);
 });

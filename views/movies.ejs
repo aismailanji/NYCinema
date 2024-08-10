@@ -2,11 +2,80 @@
 <body>
     <%- include('partials/navbar.ejs') %>
 
-    <div class="events" style="padding-top: 60px;">
+    <div class="movies" style="padding-top: 60px;">
     <h1>How the Movies are Found?</h1>
 
+    <p>
+        Given your input our website will find movies showing in the location of your choice.
+
+        <br>
+        <br>
+    
+
+        The API we will be using is a Fandago API that will find movies on a given input in theater near you.
+    </p>
 
 
+    <h3>Simple Demo of how movies will be generated</h3>
+
+        <div class="moviesdemobox active">
+            <form action="/api/movies" method="GET" class="moviesdemo" id="eventdemo">
+                <input id="mzipcode" type="number" name="mzipcode" placeholder="Zip Code" class="input" required>
+                <input type="submit" value="Submit" class="moviessub">
+            </form>
+        </div>
+
+        <div class="moviesdiv1">
+            <div class="moviesdiv2 event1"></div>
+            <div class="moviesdiv2 event2"></div>
+            <div class="moviesdiv2 event3"></div>
+        </div>
+
+        <div class="resetbox">
+            <form action="/submit-event-retry" method="POST" class="reset">
+                <input type="submit" value="Reset" class="resetbtn">
+            </form>
+
+        </div>
+
+
+    </p>
+
+
+    </div>
+
+    <div style="height: 40px; margin-bottom: 20px; width: 100%;"> </div>
+
+
+    <!-- <script>
+var apikey = "myapikey";
+var baseUrl = "http://api.rottentomatoes.com/api/public/v1.0";
+
+// construct the uri with our apikey
+var moviesSearchUrl = baseUrl + '/movies.json?apikey=' + apikey;
+var query = "Gone with the Wind";
+
+$(document).ready(function() {
+
+  // send off the query
+  $.ajax({
+    url: moviesSearchUrl + '&q=' + encodeURI(query),
+    dataType: "jsonp",
+    success: searchCallback
+  });
+});
+
+// callback for when we get back the results
+function searchCallback(data) {
+ $(document.body).append('Found ' + data.total + ' results for ' + query);
+ var movies = data.movies;
+ $.each(movies, function(index, movie) {
+   $(document.body).append('<h1>' + movie.title + '</h1>');
+   $(document.body).append('<img src="' + movie.posters.thumbnail + '" />');
+ });
+}
+
+    </script> -->
 
     <%- include('partials/register.ejs') %>
     <%- include('partials/footer.ejs') %>

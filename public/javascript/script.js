@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
+    const login_btn = document.getElementById("login");
+
     const wrap = document.querySelector(".wrap");
 
     const register = document.querySelector(".register-link");
@@ -13,10 +15,20 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelector(".msg").classList.remove("active");
     });
 
-    const login_btn = document.getElementById("login");
-
-    login_btn.addEventListener("click", () => {
-        wrap.classList.add("active-popup");
+    login_btn_text = login_btn.textContent;
+    login_btn.addEventListener("click", ()=> {
+        if(login_btn_text == 'Sign-in/Sign-up') {
+            wrap.classList.add("active-popup");
+        }
+        else if(login_btn_text == 'My Account') {
+            try {
+                fetch('/myaccount', {
+                    method: 'GET',
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
     });
 
     const icon_close = document.querySelector(".icon-close");
@@ -56,27 +68,18 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             const data = await response.json();
-            console.log(data);
-            // if(data.accountExists == true) {
-            
-            if(data.access_token) {
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('refresh_token', data.refresh_token);
+            if(data.login) {
                 wrap.classList.remove("active-popup");
-                document.querySelector('#login').textContent = "My Account";
-                setTimeout(() => {
-                    refreshToken(); 
-                }, 45000);
-            }
-            else {
-                const result = data.msg;    
+                window.location.href = "/myaccount";
+            } else {
+                const result = data.msg;
                 document.querySelector('.msg').textContent = result;
                 document.querySelector('.msg').classList.add("active");
             }
         } catch (error) {
             console.error('Error:', error);
         }
+    
     });
 
     const eventdemo = document.querySelector('.eventsdemo')
@@ -114,52 +117,82 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelector('.eventsdemobox').classList.add("active");
     });
 
-
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-        document.querySelector('#login').textContent = "My Account";
-        wrap.classList.remove("active-popup");
-
-        refreshToken();
-    }
-    else {
-        document.querySelector('#login').textContent = "Sign in/Sign Up";
-        wrap.classList.remove("active-popup");
-    };
-
-    function refreshToken() {
-        const accessToken = localStorage.getItem('access_token');
-        if (accessToken) {
-            fetch('/refresh_token', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                },
-                body: JSON.stringify({ token: refreshToken })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.access_token) {
-                    localStorage.setItem('access_token', data.access_token);
-                    setTimeout(() => {
-                        refreshToken();
-                    }, 45000); // Refresh token again after 45 seconds for testing
-                } else {
-                    logout();
-                }
-            })
-            .catch(error => {
-                console.error('Error refreshing token:', error);
-                logout();
-            });
-        } else {
-            logout();
+    const moviedemo = document.querySelector('.moviesdemo');
+    moviedemo.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        try {
+            const response = await fetch(`/api/movies?postalcode=${postalCode}`);
+            const data = await response.json();
+            displayMovies(data);
+        } catch (error) {
+            console.error('Error fetching movies:', error);
         }
+    });
+
+    function displayMovies(movies) {
+        movies.forEach(movie => {
+            const movieElement = document.querySelector('.moviesdiv2 .event1');
+            movieElement.className = 'movie';
+            movieElement.innerHTML = `
+                <h2>${movie.title}</h2>
+                <img src="${movie.poster}" alt="${movie.title} Poster">
+                <p>Year: ${movie.year}</p>
+                <p>Runtime: ${movie.runtime} minutes</p>
+            `;
+            moviesContainer.appendChild(movieElement);
+        });
     }
 
-    function logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('access_token');
-        document.querySelector('#login').textContent = "Sign in/Sign Up";
-        wrap.classList.remove("active-popup");
+
+    $(document).ready(function() {
+        const query = "Gone with the Wind"; // or retrieve from input field
+        $.ajax({
+            url: '/api/movies',
+            data: { query: query },
+            success: searchCallback,
+            error: function(xhr, status, error) {
+                console.error('Error fetching movies:', error);
+            }
+        });
+    });
+
+    function searchCallback(data) {
+        $(document.body).append('Found ' + data.total + ' results for ' + query);
+        var movies = data.movies;
+        $.each(movies, function(index, movie) {
+            $(document.body).append('<h1>' + movie.title + '</h1>');
+            $(document.body).append('<img src="' + movie.posters.thumbnail + '" />');
+        });
     }
+
+    const logoutbtn = document.getElementById("logout");
+    logoutbtn.addEventListener('click', () => {
+        alert("h1llo");
+        // console.log("btn clicked for logout")
+        // try {
+        //     fetch('/logout', {
+        //         method: 'GET',
+        //     });
+        // } catch (error) {
+        //     console.error('Error:', error);
+        // }
+    });
+
+    // document.body.addEventListener('click', function(event) {
+    //     if (event.target.id === 'logout') { // Check if the clicked element is the logout button
+    //         alert('clicked');
+    //         try {
+    //             fetch('/logout', {
+    //                 method: 'GET',
+    //             }).then(response => {
+    //                 if (response.redirected) {
+    //                     window.location.href = response.url; // Redirect if the response asks to
+    //                 }
+    //             });
+    //         } catch (error) {
+    //             console.error('Error:', error);
+    //         }
+    //     }
+    // });
 });
+
