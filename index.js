@@ -59,6 +59,38 @@ app.get("/generate_plan", (req,res) => {
     res.render("generate_plan.ejs",{url});
 });
 
+app.get("/generate_plan_2", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("multipage/generate_plan_2.ejs",{url});
+});
+
+app.get("/generate_plan_3", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("multipage/generate_plan_3.ejs",{url});
+});
+
+app.get("/generate_plan_4", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("multipage/generate_plan_4.ejs",{url});
+});
+
+app.get("/generate_plan_5", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+    res.render("multipage/generate_plan_5.ejs",{url});
+});
+
+
 app.get("/movies", (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
@@ -85,10 +117,16 @@ app.get("/about", (req,res) => {
 
 app.get("/myaccount", (req,res) => {
     const isLoggedIn = req.cookies.authToken;
-    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+    const url = "<button id='login'><a href='/logout'>Sign-out</a></button>" 
     res.render("myaccount.ejs",{url});
 });
 
+app.get('/logout', (req,res) => {
+    res.clearCookie('authToken');
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+    res.render("index.ejs",{url});
+});
 
 app.post("/register", async (req,res) => {
     const username = req.body.username;
@@ -164,23 +202,6 @@ app.post("/login", async (req,res) => {
         console.log(err);
         res.json({msg: "An error occurred. Please try again."});
     }
-});
-
-app.get('/logout', (req,res) => {
-    res.clearCookie('authToken');
-    const url = "<button id='login'>Sign-in/Sign-up</button>";
-    res.render("index.ejs",{url});
-})
-
-// Token Refresh Route
-app.post('/token', (req, res) => {
-    const refreshToken = req.body.token;
-    if (refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        const accessToken = generateAccessToken({ email: user.email });
-        res.json({ accessToken: accessToken });
-    });
 });
 
 // Helper function to format date in MM/dd/yyyy hh:mm aa format
@@ -264,29 +285,23 @@ app.post('/submiteventdemo', async(req, res) => {
     }
 });
 
-app.get('/api/movies', async (req, res) => {
-    const { mzipcode } = req.query;
+app.post('/api', async (req, res) => {
+    const options = {
+        method: 'GET', // You're making a GET request to another API inside a POST handler
+        url: 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_release_type=2|3&release_date.gte={min_date}&release_date.lte={max_date}',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMGQyYjljOTUwYWNmMDhmMzUwM2U5MDMyYjBjYTU1OCIsIm5iZiI6MTcyMzQ2ODY1NS43ODg0NTQsInN1YiI6IjY2YTgxNDFhYjI0ZGVlNWEyMDhkYzY5MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.L7picE4hKe2MtUTQ1vzvrtETTAgiMvIh8VOMvW41Axc'
+        }
+    };
+
     try {
-        // Define the parameters
-        const operation = 'moviesbypostalcodesearch';
-        const parameters = `op=${operation}&postalcode=${mzipcode}`;
-        const apiKey = FNDG_API_KEY;
-        const sharedSecret = FNDG_API_SEC;
-
-        // Generate the signature
-        const sig = crypto.createHmac('sha1', sharedSecret)
-                          .update(parameters)
-                          .digest('hex');
-
-        // Form the full request URL
-        const url = `http://api.fandango.com/v1?${parameters}&apikey=${apiKey}&sig=${sig}`;
-
-        // Make the API request
-        const response = await axios.get(url);
-        res.json(response.data);
+        const response = await axios.request(options);
+        console.log(response.data.results);
+        res.json({movies: response.data.results});
     } catch (error) {
-        console.error('Error fetching movies:', error);
-        res.status(500).json({ error: 'Failed to fetch movies' });
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch data' });
     }
 });
 
