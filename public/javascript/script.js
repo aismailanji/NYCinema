@@ -28,6 +28,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error('Error:', error);
             }
         }
+        else if(login_btn_text == 'Sign-out') {
+            try {
+                fetch('/logout', {
+                    method: 'GET',
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
     });
 
     const icon_close = document.querySelector(".icon-close");
@@ -82,8 +91,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     const eventdemo = document.querySelector('.eventsdemo')
-    eventdemo.addEventListener('submit', async function(event) {
-        event.preventDefault();
+        if  (eventdemo) {
+            eventdemo.addEventListener('submit', async function(event) {
+            event.preventDefault();
         const form = event.target;
         const formData = new FormData(form);
         try {
@@ -111,10 +121,65 @@ document.addEventListener("DOMContentLoaded", function() {
             const eventContainer = document.querySelector('.eventsdiv1');
             eventContainer.innerHTML = ''; // Clear previous events
     
-            if (Array.isArray(data)) {
+            if (Array.isArray(data) && data.length > 0) {
                 const eventContainer = document.querySelector('.eventsdiv1');
                 eventContainer.innerHTML = ''; // Clear previous events
-    
+                if (data[0].description) {
+                    // Display sightseeing location
+                    const locationElement = document.createElement('div');
+                    locationElement.classList.add('event1');
+                    locationElement.innerHTML = `
+                        <h5>Sightseeing Location:</h5>
+                        <p><strong>${data[0].name}</strong></p>
+                        <p>${data[0].description}</p>
+                        <p>${data[0].address}</p>
+                    `;
+                    eventContainer.appendChild(locationElement);
+                } else {
+                    // Display events
+                    data.forEach((event, index) => {
+                        if (index < 3) { // Display only the first three events
+                            const eventElement = document.createElement('div');
+                            eventElement.classList.add('event-item');
+                    
+                            // Create a title element
+                            const titleElement = document.createElement('h5');
+                            titleElement.textContent = `Event ${index + 1}: ${event.name}`;
+                            eventElement.appendChild(titleElement);
+
+                            // Create a description element
+                            const descriptionElement = document.createElement('p');
+                            descriptionElement.classList.add('event-description');
+                            descriptionElement.innerHTML = event.shortDesc || 'No description available';
+                            eventElement.appendChild(descriptionElement);
+                    
+                            // Create a date element
+                            const dateElement = document.createElement('p');
+                            dateElement.classList.add('event-date');
+                            const startDate = new Date(event.startDate).toLocaleString();
+                            const endDate = new Date(event.endDate).toLocaleString();
+                            dateElement.textContent = `Date and Time: ${startDate} - ${endDate}`;
+                            eventElement.appendChild(dateElement);
+                    
+                            // Create a location element
+                            const locationElement = document.createElement('p');
+                            locationElement.classList.add('event-location');
+                            locationElement.textContent = `Location: ${event.address}`;
+                            eventElement.appendChild(locationElement);
+                    
+                            // Create a link to the event's permalink
+                            const linkElement = document.createElement('a');
+                            linkElement.href = event.permalink;
+                            linkElement.textContent = 'More Details';
+                            linkElement.classList.add('event-link');
+                            eventElement.appendChild(linkElement);
+                    
+                            eventContainer.appendChild(eventElement);
+                        }
+                    });
+                }
+
+                /*
                 data.forEach((event, index) => {
                     if (index < 3) { // Display only the first three events
                         const eventElement = document.createElement('div');
@@ -123,6 +188,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         eventContainer.appendChild(eventElement);
                     }
                 });
+                */
             } else {
                 console.error('Expected array but got:', data);
             }
@@ -132,25 +198,29 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error('Error:',error);
         }
     });
+    }
 
     const reseteventdemo = document.querySelector('.reset')
-    reseteventdemo.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        document.querySelector('.eventsdiv1').classList.remove("active");
-        document.querySelector('.resetbox').classList.remove("active");
-        document.querySelector('.eventsdemobox').classList.add("active");
-    });
+    if (reseteventdemo) {
+        reseteventdemo.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            document.querySelector('.eventsdiv1').classList.remove("active");
+            document.querySelector('.resetbox').classList.remove("active");
+            document.querySelector('.eventsdemobox').classList.add("active");
+        });
+    }
 
     const logoutbtn = document.getElementById("logout");
-    logoutbtn.addEventListener('click', () => {
-        console.log("btn clicked for logout")
-        try {
-            fetch('/logout', {
-                method: 'GET',
-            });
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
-
+    if (logoutbtn) {
+        logoutbtn.addEventListener('click', () => {
+            console.log("btn clicked for logout")
+            try {
+                fetch('/logout', {
+                    method: 'GET',
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    }
 });

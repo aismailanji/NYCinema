@@ -13,7 +13,6 @@ import cookieParser from "cookie-parser";
 import cheerio from 'cheerio';
 
 
-
 dotenv.config();
 const { URI, PORT, SECRET_KEY, FNDG_API_KEY,FNDG_API_SEC} = process.env;
 export{URI, PORT, SECRET_KEY};
@@ -59,6 +58,38 @@ app.get("/generate_plan", (req,res) => {
     res.render("generate_plan.ejs",{url});
 });
 
+app.get("/generate_plan_2", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("multipage/generate_plan_2.ejs",{url});
+});
+
+app.get("/generate_plan_3", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("multipage/generate_plan_3.ejs",{url});
+});
+
+app.get("/generate_plan_4", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+
+    res.render("multipage/generate_plan_4.ejs",{url});
+});
+
+app.get("/generate_plan_5", (req,res) => {
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+
+    res.render("multipage/generate_plan_5.ejs",{url});
+});
+
+
 app.get("/movies", (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
@@ -85,8 +116,15 @@ app.get("/about", (req,res) => {
 
 app.get("/myaccount", (req,res) => {
     const isLoggedIn = req.cookies.authToken;
-    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+    const url = "<button id='login'><a href='/logout'>Sign-out</a></button>" 
     res.render("myaccount.ejs",{url});
+});
+
+app.get('/logout', (req,res) => {
+    res.clearCookie('authToken');
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+    res.render("index.ejs",{url});
 });
 
 
@@ -166,22 +204,6 @@ app.post("/login", async (req,res) => {
     }
 });
 
-app.get('/logout', (req,res) => {
-    res.clearCookie('authToken');
-    const url = "<button id='login'>Sign-in/Sign-up</button>";
-    res.render("index.ejs",{url});
-})
-
-// Token Refresh Route
-app.post('/token', (req, res) => {
-    const refreshToken = req.body.token;
-    if (refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        const accessToken = generateAccessToken({ email: user.email });
-        res.json({ accessToken: accessToken });
-    });
-});
 
 // Helper function to format date in MM/dd/yyyy hh:mm aa format
 function formatDateForAPI(dateStr, time) {
@@ -213,7 +235,7 @@ app.post('/submiteventdemo', async(req, res) => {
         'Staten Island': 'Si',
         'Queens': 'Qn'
     };
-    const boroughCode = boroughMap[borough] || 'Bk'; // Default to Brooklyn if unknown
+    const boroughCode = boroughMap[borough] // || 'Bk'; // Default to Brooklyn if unknown
 
     // Format the date to MM/dd/yyyy hh:mm aa format
     // const formattedDate = formatDateForAPI(date);
@@ -239,7 +261,7 @@ app.post('/submiteventdemo', async(req, res) => {
     
     // Construct the API URL with input parameters
     // correct url format example https://api.nyc.gov/calendar/search?startDate=07%2F24%2F2024%2012:00%20AM&endDate=07%2F24%2F2024%2011:59%20PM&boroughs=Bk&zip=11220&sort=DATE
-    const url = `https://api.nyc.gov/calendar/search?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&boroughs=${boroughCode}&zip=${zipcode}&sort=DATE`;
+    const url = `https://api.nyc.gov/calendar/search?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&boroughs=${boroughCode}categories=%22Athletic%22,%20%20%22Business%20%26%20Finance%22,%20%20%22City%20Government%20Office%22,%20%20%22Cultural%22,%20%20%22Education%22,%20%20%22Environment%22,%20%20%22Featured%22,%20%20%22Free%22,%20%20%22General%20Events%22,%20%20%22Health%20%26%20Public%20Safety%22,%20%20%22Hearings%20and%20Meetings%22,%20%20%22Holidays%22,%20%20%22Kids%20and%20Family%22,%20%20%22Parks%20%26%20Recreation%22,%20%20%22Street%20and%20Neighborhood%22,%20%20%22Tours%22,%20%20%22Volunteer%22&categoryOperator=OR&zip=${zipcode}&sort=DATE`;
     const headers = {
         'Cache-Control': 'no-cache',
         'Ocp-Apim-Subscription-Key': process.env.NYC_EVENTS_API_KEY,
@@ -253,10 +275,17 @@ app.post('/submiteventdemo', async(req, res) => {
         const events = await response.json();
         
         // Return the items array
-        if (events.items) {
+        if (events.items && events.items.length > 0) {
             res.json(events.items);
         } else {
-            res.json([]); // Return an empty array if no items are found
+            //res.json([]); // Return an empty array if no items are found
+            const sightseeingQuery = 'SELECT name, description, address FROM sightseeing_locations ORDER BY RANDOM() LIMIT 1';
+            const { rows } = await db.query(sightseeingQuery);
+            if (rows.length > 0) {
+                res.json(rows);
+            } else {
+                res.json([]); // Return an empty array if no sightseeing locations are found
+            }
         }
     } catch (error) {
         console.error('Error fetching events:', error);
@@ -264,29 +293,41 @@ app.post('/submiteventdemo', async(req, res) => {
     }
 });
 
-app.get('/api/movies', async (req, res) => {
-    const { mzipcode } = req.query;
+app.post('/submitcontact', (req, res) => {
+    const { name, email, message } = req.body;
+
+    const query = `
+        INSERT INTO contact_messages (name, email, message, submitted_at)
+        VALUES ($1, $2, $3, now())
+    `;
+
+    db.query(query, [name, email, message], (error, results) => {
+        if (error) {
+            console.error('Error inserting data:', error);
+            res.status(500).json({ success: false, message: 'An error occurred. Please try again.' });
+        } else {
+            res.json({ success: true, message: 'Message received!' });
+        }
+    });
+});
+
+app.post('/api', async (req, res) => {
+    const options = {
+        method: 'GET', // You're making a GET request to another API inside a POST handler
+        url: 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_release_type=2|3&release_date.gte={min_date}&release_date.lte={max_date}',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMGQyYjljOTUwYWNmMDhmMzUwM2U5MDMyYjBjYTU1OCIsIm5iZiI6MTcyMzQ2ODY1NS43ODg0NTQsInN1YiI6IjY2YTgxNDFhYjI0ZGVlNWEyMDhkYzY5MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.L7picE4hKe2MtUTQ1vzvrtETTAgiMvIh8VOMvW41Axc'
+        }
+    };
+
     try {
-        // Define the parameters
-        const operation = 'moviesbypostalcodesearch';
-        const parameters = `op=${operation}&postalcode=${mzipcode}`;
-        const apiKey = FNDG_API_KEY;
-        const sharedSecret = FNDG_API_SEC;
-
-        // Generate the signature
-        const sig = crypto.createHmac('sha1', sharedSecret)
-                          .update(parameters)
-                          .digest('hex');
-
-        // Form the full request URL
-        const url = `http://api.fandango.com/v1?${parameters}&apikey=${apiKey}&sig=${sig}`;
-
-        // Make the API request
-        const response = await axios.get(url);
-        res.json(response.data);
+        const response = await axios.request(options);
+        console.log(response.data.results);
+        res.json({movies: response.data.results});
     } catch (error) {
-        console.error('Error fetching movies:', error);
-        res.status(500).json({ error: 'Failed to fetch movies' });
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch data' });
     }
 });
 

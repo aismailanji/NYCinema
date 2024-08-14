@@ -1,52 +1,90 @@
 <%- include('partials/header.ejs') %>
-<body>
+<body style="overflow-x: hidden;">
     <%- include('partials/navbar.ejs') %>
 
-    <div class="row featurette" style="padding: 45px; margin-top: 30px; font-family: Inter;">
-        <div class="col-md-7">
+    <div class="row featurette" style="padding: 45px; margin-top: 30px; font-family: Inter; margin-bottom: 20px;">
+      <div class="col-md-7">
           <h2 class="featurette-heading fw-normal lh-1" style="text-align: center;">About Us</h2>
-          <p class="lead" style="padding: 30px; font-family: Libre Franklin;">To bring life back to the cinemas and in general to have people experience all of what NYC has to offer, we plan to create a website or web application that will recommend a movie currently being shown in theaters to the user along with some type of activity in NYC to go along with it. </p>
-        </div>
-        <div class="col-md-5">
-          <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"></rect><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
-        </div>
+          <p class="lead" style="padding: 30px; font-family: Libre Franklin;">To bring life back to the cinemas and in general to have people experience all of what NYC has to offer, we plan to create a website or web application that will recommend a movie currently being shown in theaters to the user along with some type of activity in NYC to go along with it.</p>
       </div>
+      <div class="col-md-5">
+          <img src="/assets/bluegradientlogo.png" alt="Logo" class="featurette-image img-fluid mx-auto" width="500" height="500">
+      </div>
+  </div>
 
 
     <div class="row" style="margin-left: 5px; margin-right: 5px;">
         <div class="col-lg-4">
-          <svg class="bd-placeholder-img rounded-circle" style="margin-left: 165px; margin-bottom:10px;" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
+          <svg class="bd-placeholder-img rounded-circle" style="margin-bottom: 20px;" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
           <h2 style="text-align: center; color: #af3b6e"class="fw-normal">Ariela</h2>
           <p style="font-family: Libre Franklin;">Some representative placeholder content for the three columns of text below the carousel. This is the first column.</p>
         </div><!-- /.col-lg-4 -->
         <div class="col-lg-4">
-          <svg class="bd-placeholder-img rounded-circle" style="margin-left: 165px; margin-bottom:10px;" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
+          <svg class="bd-placeholder-img rounded-circle" style="margin-bottom: 20px;" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
           <h2 style="text-align: center; color: #e27396"class="fw-normal">Mane</h2>
           <p style="font-family: Libre Franklin;">Another exciting bit of representative placeholder content. This time, we've moved on to the second column.</p>
         </div><!-- /.col-lg-4 -->
         <div class="col-lg-4">
-          <svg class="bd-placeholder-img rounded-circle" style="margin-left: 165px; margin-bottom:10px;" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
+          <svg class="bd-placeholder-img rounded-circle" style="margin-bottom: 20px;" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect></svg>
           <h2 style="text-align: center; color:#758bfd" class="fw-normal">Jason</h2>
           <p style="font-family: Libre Franklin;">And lastly this, the third column of representative placeholder content.</p>
         </div><!-- /.col-lg-4 -->
       </div>
 
-      <div class="container">
-        <div class="testing" style="background-color: white; ">
+      <div class="aboutcontainer">
+        <div class="contactbox" style="background-color: #f8f9FA;">
             <h1 style="font-family: Inter;">Contact Us</h1>
-            <form>
-                <label for="fname">Name:</label><br>
-                <input class="submit" type="text" id="fname" name="fname" size="50"><br>
-                <label for="lname">Email:</label><br>
-                <input class="submit" type="text" id="lname" name="lname" size="50"><br>
-            
-                <label for="fname">Message:</label><br>
-                <textarea class="submit"name="paragraph_text" cols="50" rows="7"></textarea>
-
-                <input class="submit" type="submit" style="margin-left: 145px; background-color: #758bfd;" value="Send your Message" />
+            <form id="contactForm" >
+                <label for="fname">Your Name:</label><br>
+                <input class="submit" type="text" id="fname" name="fname" size="50" required><br>
+                
+                <label for="email">Your Email:</label><br>
+                <input class="submit" type="email" id="email" name="email" size="50" required><br>
+                
+                <label for="message">Message:</label><br>
+                <textarea class="submit" id="message" name="message" cols="50" rows="7" required></textarea><br>
+                
+                <input class="submit" type="submit" style="margin-left: 145px; background-color: #758bfd; border: none; padding-top: 10px; padding-right: 20px; padding-bottom: 10px; padding-left: 20px; margin: 20px auto 0; display: block;" value="Send Your Message" />
             </form>
+
+            <div id="successMessage" style="display: none; color: #E27396; text-align: center; margin-top: 10px;">
+                Thank you! Your message has been sent.
+            </div>
         </div>
-      </div>
+    </div>
+    
+    <script>
+    document.getElementById('contactForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // prevent the form from submitting the default way
+    
+        const formData = {
+            fname: document.getElementById('fname').value,
+            email: document.getElementById('email').value,
+            message: document.getElementById('message').value
+        };
+    
+        fetch('/submitcontact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('contactForm').reset(); // clear the form
+                document.getElementById('successMessage').style.display = 'block'; // show success message
+            } else {
+                alert('An error occurred. Please try again.');
+            }
+        })
+        .catch(error => {
+            alert('An error occurred. Please try again.');
+            console.error('Error:', error);
+        });
+    });
+    </script>
 
 
       <%- include('partials/register.ejs') %>

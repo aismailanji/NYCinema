@@ -1,28 +1,23 @@
 <%- include('../partials/header.ejs') %>
 <body>
     <%- include('../partials/navbar.ejs') %>
-
     <div class="container" style="height: 10px;">
         <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
       </div>
-      <div class="outcomes">
-        <label for="activity">Here is an activity with your preferences!</label>
+      <div class="outcomes" style="margin-top: -75px;">
+        <label class="h5" for="activity">Here is an activity with your preferences!</label>
         <div class="something">
           <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
           <h4 style="text-align: center; margin: auto;">Activity</h4>
         </div>
-
         <button id="nextPage" class="submit" type="button" style="margin: auto;">Show me my plan!</button>
       </div>
   
       <div class="container" style="height: 10px;">
           
       </div>
-
     <%- include('../partials/register.ejs') %>
-
     <%- include('../partials/footer.ejs') %>
-
     <script>
       document.getElementById('nextPage').addEventListener('click', function() {
         window.location.href = '/generate_plan_5';
