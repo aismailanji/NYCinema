@@ -135,16 +135,23 @@ document.addEventListener("DOMContentLoaded", function() {
                         <p>${data[0].address}</p>
                     `;
                     eventContainer.appendChild(locationElement);
+
+                    // Handle sightseeing location as the event
+                    selectedEvent = {
+                        name: data[0].name,
+                        description: data[0].description,
+                        address: data[0].address
+                    };
                 } else {
                     // Display events
                     data.forEach((event, index) => {
-                        if (index < 3) { // Display only the first three events
+                        if (index < 1) { // Display only the first three events
                             const eventElement = document.createElement('div');
                             eventElement.classList.add('event-item');
                     
                             // Create a title element
                             const titleElement = document.createElement('h5');
-                            titleElement.textContent = `Event ${index + 1}: ${event.name}`;
+                            titleElement.textContent = `Event ${event.name}`; // ${index + 1}: ${event.name}`;
                             eventElement.appendChild(titleElement);
 
                             // Create a description element
@@ -177,7 +184,20 @@ document.addEventListener("DOMContentLoaded", function() {
                             eventContainer.appendChild(eventElement);
                         }
                     });
+
+                    // Handle event from API
+                    selectedEvent = {
+                        name: data[0].name,
+                        shortDesc: data[0].shortDesc,
+                        startDate: data[0].startDate,
+                        endDate: data[0].endDate,
+                        address: data[0].address,
+                        permalink: data[0].permalink
+                    };
                 }
+
+                // Save the selected event to localStorage
+                localStorage.setItem('selectedEvent', JSON.stringify(selectedEvent));
 
                 /*
                 data.forEach((event, index) => {

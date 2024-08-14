@@ -2,8 +2,90 @@
 <body style="margin-top: 80px; margin-left: 20px;">
     <%- include('partials/navbar.ejs') %>
 
-    <h1>HELLO WORLD</h1>
+    <!-- <h1>HELLO WORLD</h1>
     <form action="/logout" method="GET" class="login-submit">
         <button type="submit" id="logout">Logout</button>
-    </form>
+    </form> -->
+
+
+
+
+    <section class="py-5 text-center container" style="margin-top:1px">
+        <div class="row py-lg-5">
+          <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light" style="font-family: Inter;">Welcome to your Account</h1>
+            <p class="lead text-body-secondary" style="font-family: Libre Franklin;">Here is your account page where you can view and/or delete itineraries, and sign out when you're done.</p>
+            <p>
+                <button id="Signout" type="button" style="background-color: #758bfd;" class="btn btn-primary btn-lg px-4 me-md-2">Sign-out</button>
+            </p>
+          </div>
+        </div>
+    </section>
+
+    <section class="text-center">
+        <h1 style="font-family: Inter;">My Itineraries</h1>
+        <form id="inputForm">
+            <input type="text" id="userInput" placeholder="Enter a date" required>
+            <button type="submit">Search</button>
+        </form>
+        <ul style="margin-left: 22px;" id="dynamicList"></ul>
+        <div class="buttons-space">
+            <button id="deleteButton" class="button-1" style="margin: auto; margin-top:-5px;">Delete Itinerary</button>
+            <button id="viewButton" class="button-1" style="margin: auto; margin-top:-5px;">View Itinerary</button>
+        </div>
+    </section>
+
+    <div class="outcomes">
+        <div class="profile-event-details">
+            <!-- Saved event details will appear here -->
+        </div>
+    </div>
+
+    <div class="bottom-space"></div>
+
     <%- include('partials/footer.ejs') %>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const profileEventContainer = document.querySelector('.profile-event-details');
+
+        // Retrieve the event data from localStorage
+        const savedProfileEvent = localStorage.getItem('profileEvent');
+
+        if (savedProfileEvent) {
+            const event = JSON.parse(savedProfileEvent);
+
+            const eventElement = document.createElement('div');
+            eventElement.classList.add('event-item');
+
+            const titleElement = document.createElement('h5');
+            titleElement.textContent = `Event: ${event.name}`;
+            eventElement.appendChild(titleElement);
+
+            const descriptionElement = document.createElement('p');
+            descriptionElement.classList.add('event-description');
+            descriptionElement.innerHTML = event.shortDesc || 'No description available';
+            eventElement.appendChild(descriptionElement);
+
+            const dateElement = document.createElement('p');
+            dateElement.classList.add('event-date');
+            const startDate = new Date(event.startDate).toLocaleString();
+            const endDate = new Date(event.endDate).toLocaleString();
+            dateElement.textContent = `Date and Time: ${startDate} - ${endDate}`;
+            eventElement.appendChild(dateElement);
+
+            const locationElement = document.createElement('p');
+            locationElement.classList.add('event-location');
+            locationElement.textContent = `Location: ${event.address}`;
+            eventElement.appendChild(locationElement);
+
+            const linkElement = document.createElement('a');
+            linkElement.href = event.permalink;
+            linkElement.textContent = 'More Details';
+            linkElement.classList.add('event-link');
+            eventElement.appendChild(linkElement);
+
+            profileEventContainer.appendChild(eventElement);
+    }
+});
+    </script>
+</body>

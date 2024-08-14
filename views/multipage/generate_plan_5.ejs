@@ -6,22 +6,12 @@
       </div>
       <div class="outcomes" style="margin-top: -75px;">
         <label class="h5" for="activity">Here is your plan for the day out in NYC!</label>
-        <div class="energy">
-          <div class="something">
-            <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
-            <h4 style="text-align: center; margin: auto;">Movie</h4>
-          </div>
-  
-          <h1>&#8594;</h1>
-  
-          <div class="something">
-            <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
-            <h4 style="text-align: center; margin: auto;">Activity</h4>
-          </div>
+        <div class="event-details">
+
         </div>
         <button id="nextPage" class="submit" type="button" style="margin: auto; padding: 10px 24px;">Save to my profile</button>
       </div>
-  
+
       <div class="container" style="height: 10px;">
           
       </div>
@@ -29,8 +19,76 @@
     <%- include('../partials/footer.ejs') %>
     <script>
       document.getElementById('nextPage').addEventListener('click', function() {
+        const eventDetails = localStorage.getItem('selectedEvent');
+
+        if (eventDetails) {
+            // Save the event details to a specific key for the myaccount page
+            localStorage.setItem('profileEvent', eventDetails);
+        }
+
         sessionStorage.setItem('success', 'true');
         window.location.href = '/';
       });
+
+      document.addEventListener('DOMContentLoaded', () => {
+      const eventContainer = document.querySelector('.event-details');
+
+      // Retrieve the event data from localStorage
+      const savedEvent = localStorage.getItem('selectedEvent');
+
+      if (savedEvent) {
+          const event = JSON.parse(savedEvent);
+
+          const eventElement = document.createElement('div');
+          eventElement.classList.add('event-item');
+  
+          // Create a title element
+          const titleElement = document.createElement('h5');
+          titleElement.textContent = `Event: ${event.name}`; // ${index + 1}: ${event.name}`;
+          eventElement.appendChild(titleElement);
+
+          // Create a description element
+          const descriptionElement = document.createElement('p');
+          descriptionElement.classList.add('event-description');
+          descriptionElement.innerHTML = event.shortDesc || 'No description available';
+          eventElement.appendChild(descriptionElement);
+  
+          // Create a date element
+          const dateElement = document.createElement('p');
+          dateElement.classList.add('event-date');
+          const startDate = new Date(event.startDate).toLocaleString();
+          const endDate = new Date(event.endDate).toLocaleString();
+          dateElement.textContent = `Date and Time: ${startDate} - ${endDate}`;
+          eventElement.appendChild(dateElement);
+  
+          // Create a location element
+          const locationElement = document.createElement('p');
+          locationElement.classList.add('event-location');
+          locationElement.textContent = `Location: ${event.address}`;
+          eventElement.appendChild(locationElement);
+  
+          // Create a link to the event's permalink
+          const linkElement = document.createElement('a');
+          linkElement.href = event.permalink;
+          linkElement.textContent = 'More Details';
+          linkElement.classList.add('event-link');
+          eventElement.appendChild(linkElement);
+  
+          eventContainer.appendChild(eventElement);
+      }
+      });
+
+      /*
+      document.addEventListener('DOMContentLoaded', () => {
+      const movieContainer = document.querySelector('.movie-details');
+
+      // Retrieve the movie data from localStorage
+      const savedMovie = localStorage.getItem('selectedMovie');
+
+      if (savedMovie) {
+        const movie = JSON.parse(savedMovie);
+      }
+      });
+      */
     </script>
 </body>

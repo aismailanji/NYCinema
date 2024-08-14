@@ -252,7 +252,7 @@ app.post('/submiteventdemo', async(req, res) => {
 
     // Add 7 days to the start date to get the end date
     const endDateObj = new Date(startDateObj);
-    endDateObj.setDate(startDateObj.getDate() + 7);
+    //endDateObj.setDate(startDateObj.getDate() + 7);
     
     // Format the end date
     const endDate = formatDateForAPI(endDateObj, '11:59 PM');
@@ -282,7 +282,15 @@ app.post('/submiteventdemo', async(req, res) => {
             const sightseeingQuery = 'SELECT name, description, address FROM sightseeing_locations ORDER BY RANDOM() LIMIT 1';
             const { rows } = await db.query(sightseeingQuery);
             if (rows.length > 0) {
-                res.json(rows);
+                //res.json(rows);
+                const sightseeingLocation = rows[0];
+                const sightseeingData = {
+                    name: sightseeingLocation.name,
+                    description: sightseeingLocation.description,
+                    address: sightseeingLocation.address,
+                    // Add any other necessary fields here
+                };
+                res.json([sightseeingData]); // Return an array so it matches the event structure
             } else {
                 res.json([]); // Return an empty array if no sightseeing locations are found
             }
