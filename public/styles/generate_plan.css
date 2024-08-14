@@ -30,14 +30,18 @@ h1{
 }
 
 .outcomes{
-    height: 500px; 
-    width: 700px; 
+    min-height: 500px; 
+    max-width: 800px; 
+    height: auto;
     margin: auto;
     margin-top: 40px;
     width: 50%;
     padding: 10px;
     margin-bottom: 60px;
-    background-color: #E27396;
+    border: 1px solid #E27396;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    color: #af3b6e;
+    background: rgba(226, 115, 150, 0.2);
     border-radius: 20px;
 
     display: flex;

@@ -5,17 +5,17 @@
     <div class="container" style="height: 10px;">
       <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
     </div>
-    <div class="outcomes" style="margin-bottom: 50px;">
-      <label for="theater" style="margin-top: 50px;">Select theater location</label>
+    <div class="outcomes" style="margin-bottom: 50px; margin-top: -75px;">
+      <label class="h5" for="theater" style="margin-top: 50px;">Select theater location</label>
       <div class="dropdown-container" style="position: relative; width: 300px; margin: 1px;">
         <input type="text" id="theaterInput" class="button" placeholder="Type theater name" style="text-align: center; width: 100%; box-sizing: border-box;">
         <div id="theaterDropdown" class="dropdown-content"></div>
       </div>
 
-      <label style="text-align: center; margin-top: 100px" for="genre">Select desired movie genre</label>
+      <label class="h5" style="text-align: center; margin-top: 100px" for="genre">Select desired movie genre</label>
       <select class="button" name="genre" id="genre" style="margin: 1px; text-align: center; width: 150px; ">
         <option value="Horror">Horror</option>
-        <option value="Romance">Romance</option>
+        <option value="Action">Action</option>
         <option value="Comedy">Comedy</option>
       </select> 
 
@@ -77,8 +77,32 @@
       theaterDropdown.style.backgroundColor = '#fff';
       theaterDropdown.style.zIndex = '1000';
 
-      document.getElementById('nextPage').addEventListener('click', function() {
-        window.location.href = '/generate_plan_2';
-      });
+      // document.getElementById('nextPage').addEventListener('click', function() {
+      //   console.log("next page thing pressed");
+      // const selectedGenre = document.getElementById('genre').value;
+      // const selectedTheater = document.getElementById('theaterInput').value;
+
+      // // Send data using a POST request
+      // fetch('/test_generate_plan_2', {
+      //     method: 'GET',
+      //     headers: {
+      //       'Content-Type': 'application/json'
+      //     },
+      //     // body: JSON.stringify({
+      //     //   genre: selectedGenre,
+      //     //   theater: selectedTheater
+      //     // })
+      // });
+    // });
+
+    document.getElementById('nextPage').addEventListener('click', function() {
+      const selectedGenre = document.getElementById('genre').value;
+      const selectedTheater = document.getElementById('theaterInput').value;
+
+
+      const url = `/generate_plan_2?genre=${encodeURIComponent(selectedGenre)}&theater=${encodeURIComponent(selectedTheater)}`;
+
+          window.location.href = url;
+        });
   </script>
 </body>

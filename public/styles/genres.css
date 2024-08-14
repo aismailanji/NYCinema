@@ -1,7 +1,17 @@
 .card {
-    border: 1px solid #251f47 !important;
+    border: 1px solid #E27396 !important;
     border-radius: 15px;
     box-shadow: 0 0 30px rgba(0,0,0,0.15) !important;
+    color: #af3b6e !important;
+    background: rgba(226, 115, 150, 0.2) !important;
+}
+
+.card-body {
+    padding-bottom: 15px !important;
+}
+
+.card-body p {
+    margin-bottom: 0 !important;
 }
 
 body {

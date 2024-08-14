@@ -2,13 +2,11 @@
 <body>
     <%- include('../partials/navbar.ejs') %>
 
-
-    
     <div class="container " style="height: 10px;">
-        <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
-        </div>
-        <div class="outcomes">
-          <h5>Enter your event recommendation preferences</h5>
+      <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
+      </div>
+      <div class="outcomes" style="margin-top: -75px;">
+        <h5>Enter your event preferences</h5>
           <div class="eventsdemobox active">
             <form action="/submit-event-demo" method="POST" class="eventsdemo" id="eventdemo">
                 <input id="sdate" type="date" name="sdate" placeholder="Start Date" class="input" required>

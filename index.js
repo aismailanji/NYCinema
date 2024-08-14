@@ -10,8 +10,8 @@ import crypto from "crypto";
 import mongoose from "mongoose";
 import { cookie } from "express-validator";
 import cookieParser from "cookie-parser";
-import cheerio from 'cheerio';
-
+import cheerio, { html } from 'cheerio';
+import { stringify } from "querystring";
 
 
 dotenv.config();
@@ -21,6 +21,10 @@ export{URI, PORT, SECRET_KEY};
 let app = express();
 let port = 3000;
 const saltRounds = 10;
+let movieobjs;
+let selectedtitle;
+let movielist;
+let moviesaved;
 
 const db = new pg.Client({
     user: "postgres",
@@ -44,34 +48,38 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.set('view engine', 'ejs');
 
-app.get("/", (req,res) => {
+app.get("/", async (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
-    res.render("index.ejs",{url});
-
+    const movcon = await upcomingMovies();
+    res.render("index.ejs",{url, movcon});
 });
 
 app.get("/generate_plan", (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
-
-
     res.render("generate_plan.ejs",{url});
 });
 
-app.get("/generate_plan_2", (req,res) => {
-    const isLoggedIn = req.cookies.authToken;
-    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+app.get("/generate_plan_2", async (req, res) => {
+    const url = "<button id='login'><a href='/myaccount'>My Account</a></button>";
+    const { genre, theater } = req.query;  // Extract the genre and theater from the query string
+    const result = await generateMovies(genre);
 
-
-    res.render("multipage/generate_plan_2.ejs",{url});
+    if (result.error) {
+        res.status(500).send(result.error);
+    } else {
+        const { htmlString, movieNames } = result;
+        res.render("multipage/generate_plan_2.ejs", { url, display: htmlString, movie1: movieNames[0], movie2: movieNames[1], movie3: movieNames[2] });
+    }
 });
 
 app.get("/generate_plan_3", (req,res) => {
     const isLoggedIn = req.cookies.authToken;
+
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
-
-
+    const { selectedMovieName } = req.query;  // Extract the selected movie name from the query string
+    selectedtitle = selectedMovieName;
     res.render("multipage/generate_plan_3.ejs",{url});
 });
 
@@ -83,11 +91,11 @@ app.get("/generate_plan_4", (req,res) => {
     res.render("multipage/generate_plan_4.ejs",{url});
 });
 
-app.get("/generate_plan_5", (req,res) => {
+app.get("/generate_plan_5", async (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
-
-    res.render("multipage/generate_plan_5.ejs",{url});
+    const display = await findMovie(selectedtitle);
+    res.render("multipage/generate_plan_5.ejs",{url, display});
 });
 
 
@@ -123,9 +131,7 @@ app.get("/myaccount", (req,res) => {
 
 app.get('/logout', (req,res) => {
     res.clearCookie('authToken');
-    const isLoggedIn = req.cookies.authToken;
-    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
-    res.render("index.ejs",{url});
+    res.redirect('/');
 });
 
 app.post("/register", async (req,res) => {
@@ -234,7 +240,7 @@ app.post('/submiteventdemo', async(req, res) => {
         'Staten Island': 'Si',
         'Queens': 'Qn'
     };
-    const boroughCode = boroughMap[borough] || 'Bk'; // Default to Brooklyn if unknown
+    const boroughCode = boroughMap[borough] // || 'Bk'; // Default to Brooklyn if unknown
 
     // Format the date to MM/dd/yyyy hh:mm aa format
     // const formattedDate = formatDateForAPI(date);
@@ -251,7 +257,7 @@ app.post('/submiteventdemo', async(req, res) => {
 
     // Add 7 days to the start date to get the end date
     const endDateObj = new Date(startDateObj);
-    endDateObj.setDate(startDateObj.getDate() + 7);
+    //endDateObj.setDate(startDateObj.getDate() + 7);
     
     // Format the end date
     const endDate = formatDateForAPI(endDateObj, '11:59 PM');
@@ -260,7 +266,7 @@ app.post('/submiteventdemo', async(req, res) => {
     
     // Construct the API URL with input parameters
     // correct url format example https://api.nyc.gov/calendar/search?startDate=07%2F24%2F2024%2012:00%20AM&endDate=07%2F24%2F2024%2011:59%20PM&boroughs=Bk&zip=11220&sort=DATE
-    const url = `https://api.nyc.gov/calendar/search?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&boroughs=${boroughCode}&zip=${zipcode}&sort=DATE`;
+    const url = `https://api.nyc.gov/calendar/search?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&boroughs=${boroughCode}categories=%22Athletic%22,%20%20%22Business%20%26%20Finance%22,%20%20%22City%20Government%20Office%22,%20%20%22Cultural%22,%20%20%22Education%22,%20%20%22Environment%22,%20%20%22Featured%22,%20%20%22Free%22,%20%20%22General%20Events%22,%20%20%22Health%20%26%20Public%20Safety%22,%20%20%22Hearings%20and%20Meetings%22,%20%20%22Holidays%22,%20%20%22Kids%20and%20Family%22,%20%20%22Parks%20%26%20Recreation%22,%20%20%22Street%20and%20Neighborhood%22,%20%20%22Tours%22,%20%20%22Volunteer%22&categoryOperator=OR&zip=${zipcode}&sort=DATE`;
     const headers = {
         'Cache-Control': 'no-cache',
         'Ocp-Apim-Subscription-Key': process.env.NYC_EVENTS_API_KEY,
@@ -274,10 +280,25 @@ app.post('/submiteventdemo', async(req, res) => {
         const events = await response.json();
         
         // Return the items array
-        if (events.items) {
+        if (events.items && events.items.length > 0) {
             res.json(events.items);
         } else {
-            res.json([]); // Return an empty array if no items are found
+            //res.json([]); // Return an empty array if no items are found
+            const sightseeingQuery = 'SELECT name, description, address FROM sightseeing_locations ORDER BY RANDOM() LIMIT 1';
+            const { rows } = await db.query(sightseeingQuery);
+            if (rows.length > 0) {
+                //res.json(rows);
+                const sightseeingLocation = rows[0];
+                const sightseeingData = {
+                    name: sightseeingLocation.name,
+                    description: sightseeingLocation.description,
+                    address: sightseeingLocation.address,
+                    // Add any other necessary fields here
+                };
+                res.json([sightseeingData]); // Return an array so it matches the event structure
+            } else {
+                res.json([]); // Return an empty array if no sightseeing locations are found
+            }
         }
     } catch (error) {
         console.error('Error fetching events:', error);
@@ -285,10 +306,138 @@ app.post('/submiteventdemo', async(req, res) => {
     }
 });
 
-app.post('/api', async (req, res) => {
+app.post('/submitcontact', (req, res) => {
+    const { name, email, message } = req.body;
+
+    const query = `
+        INSERT INTO contact_messages (name, email, message, submitted_at)
+        VALUES ($1, $2, $3, now())
+    `;
+
+    db.query(query, [name, email, message], (error, results) => {
+        if (error) {
+            console.error('Error inserting data:', error);
+            res.status(500).json({ success: false, message: 'An error occurred. Please try again.' });
+        } else {
+            res.json({ success: true, message: 'Message received!' });
+        }
+    });
+});
+
+
+async function upcomingMovies() {
     const options = {
         method: 'GET', // You're making a GET request to another API inside a POST handler
-        url: 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_release_type=2|3&release_date.gte={min_date}&release_date.lte={max_date}',
+        url: 'https://api.themoviedb.org/3/movie/upcoming',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMGQyYjljOTUwYWNmMDhmMzUwM2U5MDMyYjBjYTU1OCIsIm5iZiI6MTcyMzQ2ODY1NS43ODg0NTQsInN1YiI6IjY2YTgxNDFhYjI0ZGVlNWEyMDhkYzY5MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.L7picE4hKe2MtUTQ1vzvrtETTAgiMvIh8VOMvW41Axc'
+        }
+    };
+
+    try {
+        const response = await axios.request(options);
+        const movies = response.data.results;
+        console.log("upcoming movies");
+        console.log(response.data.results);
+        console.log("Total movies fetched:", movies.length); // Debugging info
+
+        const randomIndices = genRandNum(movies.length,12);
+
+        console.log(randomIndices);
+        // Get the movies corresponding to the random indices
+        const randomMovies = randomIndices.map(index => movies[index]);
+        console.log("Randomly selected movies:", randomMovies); // Debugging info
+
+        let htmlString = '<div class="upcomingmovies">';
+        randomMovies.forEach(movie => {
+            htmlString += `
+                <div class="ucmov">
+                    <img class="ucmovpos" src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title} Poster">
+                    <div class="ucmovinfo">
+                    <h5 class="ucmovtitle">${movie.title}</h6>
+                    <h6 class="ucmovdate">${movie.release_date}</h6>
+                    </div>
+                </div>
+            `;
+        });
+        htmlString += '</div>';
+
+        // console.log(htmlString);
+        return htmlString;
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch data' });
+    }
+}
+
+function genRandNum(totalMovies, arrsize) {
+    const randomIndices = new Set();
+
+    while (randomIndices.size < arrsize && randomIndices.size < totalMovies) {
+        const randomIndex = Math.floor(Math.random() * totalMovies);
+        randomIndices.add(randomIndex);
+    }
+
+    return Array.from(randomIndices);
+};
+
+function stringifyGenres(genre_ids) {
+    let gentext = "(";
+    genre_ids.forEach(genre => {
+        if (genre === 28) gentext += "Action, ";
+        if (genre === 12) gentext += "Adventure, ";
+        if (genre === 16) gentext += "Animation, ";
+        if (genre === 35) gentext += "Comedy, ";
+        if (genre === 80) gentext += "Crime, ";
+        if (genre === 99) gentext += "Documentary, ";
+        if (genre === 18) gentext += "Drama, ";
+        if (genre === 10751) gentext += "Family, ";
+        if (genre === 14) gentext += "Fantasy, ";
+        if (genre === 36) gentext += "History, ";
+        if (genre === 27) gentext += "Horror, ";
+        if (genre === 10402) gentext += "Music, ";
+        if (genre === 9648) gentext += "Mystery, ";
+        if (genre === 10749) gentext += "Romance, ";
+        if (genre === 878) gentext += "Science Fiction, ";
+        if (genre === 10770) gentext += "TV Movie, ";
+        if (genre === 53) gentext += "Thriller, ";
+        if (genre === 10752) gentext += "War, ";
+        if (genre === 37) gentext += "Western, ";
+    });
+    gentext = gentext.slice(0, -2) + ")";
+    return gentext;
+};
+
+async function generateMovies(genre) {
+    const genreMap = {
+        "Action": 28,
+        "Adventure": 12,
+        "Animation": 16,
+        "Comedy": 35,
+        "Crime": 80,
+        "Documentary": 99,
+        "Drama": 18,
+        "Family": 10751,
+        "Fantasy": 14,
+        "History": 36,
+        "Horror": 27,
+        "Music": 10402,
+        "Mystery": 9648,
+        "Romance": 10749,
+        "Science Fiction": 878,
+        "TV Movie": 10770,
+        "Thriller": 53,
+        "War": 10752,
+        "Western": 37
+    };
+
+    const selectedGenreId = genreMap[genre];
+
+    const options = {
+        method: 'GET', // You're making a GET request to another API inside a POST handler
+        url: 'https://api.themoviedb.org/3/movie/now_playing'
+        ,
         headers: {
             'accept': 'application/json',
             'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMGQyYjljOTUwYWNmMDhmMzUwM2U5MDMyYjBjYTU1OCIsIm5iZiI6MTcyMzQ2ODY1NS43ODg0NTQsInN1YiI6IjY2YTgxNDFhYjI0ZGVlNWEyMDhkYzY5MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.L7picE4hKe2MtUTQ1vzvrtETTAgiMvIh8VOMvW41Axc'
@@ -298,12 +447,85 @@ app.post('/api', async (req, res) => {
     try {
         const response = await axios.request(options);
         console.log(response.data.results);
-        res.json({movies: response.data.results});
+        const movies = response.data.results;
+
+        const filteredMovies = movies.filter(movie => movie.genre_ids.includes(selectedGenreId));
+
+        // console.log("Filtered Movies:", filteredMovies);
+
+        const randomIndices = genRandNum(filteredMovies.length,3);
+
+  
+        const randomMovies = randomIndices.map(index => filteredMovies[index]);
+        movielist = randomMovies;
+        console.log("Randomly selected movies:", randomMovies); // Debugging info
+
+        let movie1, movie2, movie3;
+        let htmlString = '<div class="displayingmov">';
+        const movieNames = [];
+        randomMovies.forEach(movie => {
+            const gentext = stringifyGenres(movie.genre_ids);
+            movieNames.push(movie.title);
+            htmlString += `
+                <div class="moviesdisplay">
+                    <div class="moviePoster">
+                        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title} Poster">
+                        <div class="movieInfo">
+                            <h6 class="movieTitle">${movie.title}</h6>
+                            <p class="movieGen">${gentext}</p>
+                            <p class="movieDes">${movie.overview}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        htmlString += '</div>';
+
+        return {
+            htmlString,
+            movieNames
+        };
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch data' });
     }
-});
+};
+
+
+async function findMovie(selectedtitle) {
+    try {
+        // Find the movie in the movielist array by matching the title
+        const filteredMovie = movielist.find(movie => movie.title === selectedtitle);
+
+        console.log("the filtermocie", filteredMovie);
+        // If no movie is found, handle it appropriately
+        if (!filteredMovie) {
+            console.error("Movie not found:", selectedtitle);
+            return '<p>Movie not found</p>';
+        }
+
+        // Generate the HTML for the selected movie
+        let htmlString = '<div class="displayingmov">';
+        const gentext = stringifyGenres(filteredMovie.genre_ids);
+        htmlString += `
+            <div class="moviesdisplay">
+                <div class="moviePoster5">
+                    <img src="https://image.tmdb.org/t/p/w500${filteredMovie.poster_path}" alt="${filteredMovie.title} Poster">
+                    <div class="movieInfo5">
+                        <h6 class="movieTitle">${filteredMovie.title}</h6>
+                    </div>
+                </div>
+            </div>
+        `;
+        htmlString += '</div>';
+
+        console.log("the html stuff", htmlString);
+        return htmlString;
+    } catch (error) {
+        console.error("Error finding movie:", error);
+        return '<p>Failed to retrieve movie details</p>';
+    }
+}
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)

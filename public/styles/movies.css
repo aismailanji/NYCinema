@@ -6,7 +6,6 @@ div.movies h1 {
     color: #E27396;
 }
 
-
 .moviesdiv1.active {
     display: flex;
     justify-content:space-around;
@@ -15,7 +14,7 @@ div.movies h1 {
 }
 
 .moviesdiv1{
-    display: none;
+    /* display: none; */
 }
 
 .moviesdiv2 {
@@ -44,15 +43,20 @@ div.movies h1 {
     border: 1px solid #251f47;
 }
 
-.moviesdemo {
+#moviesdemo {
     display: flex;
     flex-direction: column;
     width: 200px;
 }
 
-.moviesssub {
+.moviessub {
     background: #f8f9FA;
     color: #E27396;
+    border: 2px solid #251f47;
+    border-radius: 5px;
+     width: 100px; 
+     height: 30px;
+    text-align: center;
 }
 
 .resetbox {
@@ -63,4 +67,106 @@ div.movies h1 {
 .resetbox.active{
     display: flex;
     justify-content: center;
+}
+
+.displayingmov {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 650px;
+}
+
+.moviesdisplay {
+    position: relative;
+    display: flex;
+}
+
+.moviePoster {
+    width: 200px;
+    height: auto; /* Automatically adjust height according to the image */
+}
+
+.moviePoster5 {
+    width: 250px;
+    height: auto; /* Automatically adjust height according to the image */
+}
+
+
+.moviePoster img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}
+
+.moviePoster5 img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}
+
+.movieInfo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7); /* Dark background with transparency */
+    color: #E27396;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 8px;
+}
+
+.movieInfo5 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7); /* Dark background with transparency */
+    color: #E27396;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 8px;
+}
+
+.moviePoster:hover .movieInfo, .moviePoster5:hover .movieInfo5 {
+    opacity: 1; /* Show the description on hover */
+}
+
+.movieTitle, .movieGen, .movieDes {
+    margin: 5px 0;
+}
+
+.movieTitle {
+    width: 190px;
+    color: #E27396;
+    font-size: 20px;
+}
+
+.movieGen {
+    width: 190px;
+    font-size: 13px;
+}
+
+.movieDes {
+    width: 190px;
+    font-size: 15px;
+}
+
+.activity {
+    font-size: 25px;
+    margin: 10px;
 }

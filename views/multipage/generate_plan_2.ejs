@@ -1,34 +1,21 @@
+
 <%- include('../partials/header.ejs') %>
 <body>
     <%- include('../partials/navbar.ejs') %>
 
-<div class="container" style="height: 10px;">
-    <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
-    </div>
-    <div class="outcomes">
-    <label for="activity">Here are three movies showing now, select one!</label>
-    <div class="energy">
-        <div class="something">
-        <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
-        <h4 style="text-align: center; margin: auto;">Movie 1</h4>
+    <div class="container" style="height: 10px;">
+        <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
         </div>
+        <div class="outcomes" style="margin-top: -75px;">
+        <label class="h5" for="activity" style="margin-bottom: 20px;">Here are three movies showing now, select one!</label>
 
-        <div class="something">
-        <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
-        <h4 style="text-align: center; margin: auto;">Movie 2</h4>
-        </div>
+    <%-display%>
 
-        <div class="something">
-        <img src="https://media.timeout.com/images/105996556/1536/864/image.webp" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="575" height="575" loading="lazy" style="border-radius: 8px;">
-        <h4 style="text-align: center; margin: auto;">Movie 3</h4>
-        </div>
-    </div>
-
-    <select class="button" name="movies" id="movies" style="margin: auto; padding: 10px 24px;">
-        <option value="Movie_1">Movie 1</option>
-        <option value="Movie_2">Movie 2</option>
-        <option value="Movie_3">Movie 3</option>
-    </select> 
+    <select class="button" name="movies" id="movies" style="margin-top: 10px; padding: 10px 24px;">
+        <option value="<%= movie1 %>"><%=movie1%></option>
+        <option value="<%= movie2 %>"><%=movie2%></option>
+        <option value="<%= movie3 %>"><%=movie3%></option>
+    </select>  
 
     <button id="nextPage" class="submit" type="button" style="margin: auto; padding: 10px 24px;">Confirm</button>  
 
@@ -43,7 +30,11 @@
 
     <script>
         document.getElementById('nextPage').addEventListener('click', function() {
-          window.location.href = '/generate_plan_3';
+            const selectedMovieName = document.getElementById('movies').value;
+            console.log("Selected Movie Name:", selectedMovieName);  
+            const url = `/generate_plan_3?selectedMovieName=${encodeURIComponent(selectedMovieName)}`;
+            window.location.href = url;
+
         });
     </script>
     
