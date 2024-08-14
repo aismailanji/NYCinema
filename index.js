@@ -95,6 +95,7 @@ app.get("/generate_plan_5", async (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
     const display = await findMovie(selectedtitle);
+    moviesaved = display;
     res.render("multipage/generate_plan_5.ejs",{url, display});
 });
 
@@ -126,7 +127,7 @@ app.get("/about", (req,res) => {
 app.get("/myaccount", (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = "<button id='login'><a href='/logout'>Sign-out</a></button>" 
-    res.render("myaccount.ejs",{url});
+    res.render("myaccount.ejs",{url,moviesaved});
 });
 
 app.get('/logout', (req,res) => {
