@@ -8,8 +8,8 @@
           <p class="lead" style="padding: 30px; font-family: Libre Franklin;">To bring life back to the cinemas and in general to have people experience all of what NYC has to offer, we plan to create a website or web application that will recommend a movie currently being shown in theaters to the user along with some type of activity in NYC to go along with it. </p>
         </div>
         <div class="col-md-5">
-          <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"></rect><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
-        </div>
+          <img src="/assets/bluegradientlogo.png" alt="Logo" class="featurette-image img-fluid mx-auto" width="500" height="500">
+      </div>
       </div>
 
 
@@ -47,7 +47,39 @@
             </form>
         </div>
       </div>
-
+      
+      <script>
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // prevent the form from submitting the default way
+        
+            const formData = {
+                fname: document.getElementById('fname').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+        
+            fetch('/submitcontact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('contactForm').reset(); // clear the form
+                    document.getElementById('successMessage').style.display = 'block'; // show success message
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
+            })
+            .catch(error => {
+                alert('An error occurred. Please try again.');
+                console.error('Error:', error);
+            });
+        });
+        </script>
 
       <%- include('partials/register.ejs') %>
 
