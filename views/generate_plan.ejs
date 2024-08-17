@@ -67,7 +67,7 @@
         }
       });
 
-      // Position the dropdown directly below the input
+      // position the dropdown directly below the input
       theaterDropdown.style.position = 'absolute';
       theaterDropdown.style.top = `${theaterInput.offsetHeight}px`;
       theaterDropdown.style.left = '0';
@@ -77,32 +77,12 @@
       theaterDropdown.style.backgroundColor = '#fff';
       theaterDropdown.style.zIndex = '1000';
 
-      // document.getElementById('nextPage').addEventListener('click', function() {
-      //   console.log("next page thing pressed");
-      // const selectedGenre = document.getElementById('genre').value;
-      // const selectedTheater = document.getElementById('theaterInput').value;
-
-      // // Send data using a POST request
-      // fetch('/test_generate_plan_2', {
-      //     method: 'GET',
-      //     headers: {
-      //       'Content-Type': 'application/json'
-      //     },
-      //     // body: JSON.stringify({
-      //     //   genre: selectedGenre,
-      //     //   theater: selectedTheater
-      //     // })
-      // });
-    // });
-
     document.getElementById('nextPage').addEventListener('click', function() {
       const selectedGenre = document.getElementById('genre').value;
       const selectedTheater = document.getElementById('theaterInput').value;
 
-
       const url = `/generate_plan_2?genre=${encodeURIComponent(selectedGenre)}&theater=${encodeURIComponent(selectedTheater)}`;
-
-          window.location.href = url;
-        });
+      window.location.href = url;
+      });
   </script>
 </body>

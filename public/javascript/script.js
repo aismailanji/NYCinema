@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const data = await response.json();
             // here you would have to check for and error when recveing data like no events found
 
-            console.log('Received data:', data); // Log the response to inspect its format
+            console.log('Received data:', data); // log the response to inspect its format
             if (data.error) {
                 console.error(data.error);
                 return;
@@ -199,13 +199,13 @@ document.addEventListener("DOMContentLoaded", function() {
             document.querySelector('.eventsdemobox').classList.remove("active");
 
             const eventContainer = document.querySelector('.eventsdiv1');
-            eventContainer.innerHTML = ''; // Clear previous events
+            eventContainer.innerHTML = ''; // clear previous events
     
             if (Array.isArray(data) && data.length > 0) {
                 const eventContainer = document.querySelector('.eventsdiv1');
-                eventContainer.innerHTML = ''; // Clear previous events
+                eventContainer.innerHTML = ''; // clear previous events
                 if (data[0].description) {
-                    // Display sightseeing location
+                    // display sightseeing location
                     const locationElement = document.createElement('div');
                     locationElement.classList.add('event1');
                     locationElement.innerHTML = `
@@ -216,16 +216,16 @@ document.addEventListener("DOMContentLoaded", function() {
                     `;
                     eventContainer.appendChild(locationElement);
 
-                    // Handle sightseeing location as the event
+                    // handle sightseeing location as the event
                     selectedEvent = {
                         name: data[0].name,
                         description: data[0].description,
                         address: data[0].address
                     };
                 } else {
-                    // Display events
+                    // display events
                     data.forEach((event, index) => {
-                        if (index < 1) { // Display only the first three events
+                        if (index < 1) { // display only the first event
                             const eventElement = document.createElement('div');
                             eventElement.classList.add('event-item');
                     
@@ -265,7 +265,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                     });
 
-                    // Handle event from API
+                    // handle event from API
                     selectedEvent = {
                         name: data[0].name,
                         shortDesc: data[0].shortDesc,
@@ -276,19 +276,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     };
                 }
 
-                // Save the selected event to localStorage
+                // save the selected event to localStorage
                 localStorage.setItem('selectedEvent', JSON.stringify(selectedEvent));
-
-                /*
-                data.forEach((event, index) => {
-                    if (index < 3) { // Display only the first three events
-                        const eventElement = document.createElement('div');
-                        eventElement.classList.add(`event${index + 1}`);
-                        eventElement.textContent = `Event ${index + 1}: ${event.name}`;
-                        eventContainer.appendChild(eventElement);
-                    }
-                });
-                */
             } else {
                 console.error('Expected array but got:', data);
             }

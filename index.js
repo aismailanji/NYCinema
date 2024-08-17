@@ -230,10 +230,8 @@ app.post('/submiteventdemo', async(req, res) => {
     if (!date || !borough || !zipcode) {
         return res.status(400).json({ error: 'Missing required parameters' });
     }
-
-    //console.log(`Received parameters: date=${date}, borough=${borough}, zipcode=${zipcode}`);
     
-    // Normalize borough input to match API expected values
+    // normalize borough input to match API expected values
     const boroughMap = {
         'Brooklyn': 'Bk',
         'Bronx': 'Bx',
@@ -241,26 +239,13 @@ app.post('/submiteventdemo', async(req, res) => {
         'Staten Island': 'Si',
         'Queens': 'Qn'
     };
-    const boroughCode = boroughMap[borough] // || 'Bk'; // Default to Brooklyn if unknown
+    const boroughCode = boroughMap[borough]
 
-    // Format the date to MM/dd/yyyy hh:mm aa format
-    // const formattedDate = formatDateForAPI(date);
-
-    // Format the start and end dates
-    //const startDate = formatDateForAPI(date, '12:00 AM');
-    //const endDate = formatDateForAPI(date, '11:59 PM');
-
-    // Create a Date object for the start date
+    // Create a Date object for the start date and end date
     const startDateObj = new Date(date);
-    
-    // Format the start date
     const startDate = formatDateForAPI(startDateObj, '12:00 AM');
 
-    // Add 7 days to the start date to get the end date
     const endDateObj = new Date(startDateObj);
-    //endDateObj.setDate(startDateObj.getDate() + 7);
-    
-    // Format the end date
     const endDate = formatDateForAPI(endDateObj, '11:59 PM');
 
     console.log(`Received formatted parameters: start date=${startDate}, end date=${endDate}, borough=${boroughCode}, zipcode=${zipcode}`);
@@ -280,25 +265,22 @@ app.post('/submiteventdemo', async(req, res) => {
         }
         const events = await response.json();
         
-        // Return the items array
+        // return the items array
         if (events.items && events.items.length > 0) {
             res.json(events.items);
         } else {
-            //res.json([]); // Return an empty array if no items are found
             const sightseeingQuery = 'SELECT name, description, address FROM sightseeing_locations ORDER BY RANDOM() LIMIT 1';
             const { rows } = await db.query(sightseeingQuery);
             if (rows.length > 0) {
-                //res.json(rows);
                 const sightseeingLocation = rows[0];
                 const sightseeingData = {
                     name: sightseeingLocation.name,
                     description: sightseeingLocation.description,
                     address: sightseeingLocation.address,
-                    // Add any other necessary fields here
                 };
-                res.json([sightseeingData]); // Return an array so it matches the event structure
+                res.json([sightseeingData]); // return an array so it matches the event structure
             } else {
-                res.json([]); // Return an empty array if no sightseeing locations are found
+                res.json([]); // return an empty array if no sightseeing locations are found
             }
         }
     } catch (error) {

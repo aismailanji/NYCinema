@@ -27,7 +27,7 @@
         const eventDetails = localStorage.getItem('selectedEvent');
 
         if (eventDetails) {
-            // Save the event details to a specific key for the myaccount page
+            // save the event details for the myaccount page
             localStorage.setItem('profileEvent', eventDetails);
         }
 
@@ -38,7 +38,7 @@
       document.addEventListener('DOMContentLoaded', () => {
       const eventContainer = document.querySelector('.event-details');
 
-      // Retrieve the event data from localStorage
+      // retrieve the event data from localStorage
       const savedEvent = localStorage.getItem('selectedEvent');
 
       if (savedEvent) {
@@ -82,22 +82,6 @@
           eventContainer.appendChild(eventElement);
       }
       });
-    
-      // document.addEventListener('DOMContentLoaded', () => {
-      // const movieContainer = document.querySelector('.movie-details');
-
-      // // Retrieve the movie data from localStorage
-      // const savedMovie = localStorage.getItem('selectedMovieName');
-
-      // if (savedMovie) {
-      //   console.log("saved")
-      //   const movie = JSON.parse(savedMovie);
-      //   movieContainer.textContent = movie;
-      // }
-      // else {
-      //   console.log("error");
-      // }
-      // });
   
     </script>
 </body>
