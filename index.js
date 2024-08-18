@@ -115,11 +115,9 @@ app.get("/about", (req,res) => {
 app.get("/myaccount", async (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = "<button id='login'><a href='/logout'>Sign-out</a></button>";
-    // const url = "<button id='logout'>Sign-out</a></button>";
-    const userId = req.cookies.userId;  // Assuming the user's ID is stored in a cookie
+    const userId = req.cookies.userId; 
 
-        try {
-
+    try {
         const movieQuery = await db.query("SELECT * FROM user_movies WHERE user_email = $1", [userId]);
         const eventQuery = await db.query("SELECT * FROM user_events WHERE user_email = $1", [userId]);
 
@@ -127,8 +125,6 @@ app.get("/myaccount", async (req,res) => {
         const events = eventQuery.rows;
         
         const numofplans = movieQuery.rowCount;
-
-
         res.render('myaccount.ejs', { url, movies, events, numofplans });
     } catch (err) {
         console.error('Error retrieving data:', err);
@@ -147,30 +143,27 @@ app.post("/register", async (req,res) => {
     const email = req.body.email;
     const password = req.body.password;
 
-
     try {
         const result = await db.query("SELECT * FROM accounts WHERE email = $1", [email,]);
 
         if(result.rows.length > 0) {
             res.json({msg: "Email already exists. Try logging in."});
-        }
-        else {
+        } else {
             bcrypt.hash(password, saltRounds, async (err, hash) => {
-                if(err) {
-                    console.error("Error hashing password: ", err);
-                    res.json({msg: "Error hashing password."});
-                }
-                else {
-                    console.log("Hashed Password: ", hash);
-                    await db.query(
-                        "INSERT INTO accounts (username, email, password) VALUES ($1,$2,$3)", [username, email, hash]
-                    );
-                    res.json({msg: "Registration complete. Please log in."});
-                }
+            if(err) {
+                console.error("Error hashing password: ", err);
+                res.json({msg: "Error hashing password."});
+            }
+            else {
+                console.log("Hashed Password: ", hash);
+                await db.query(
+                    "INSERT INTO accounts (username, email, password) VALUES ($1,$2,$3)", [username, email, hash]
+                );
+                res.json({msg: "Registration complete. Please log in."});
+            }
             })
         }
-    }
-    catch(err) {
+    } catch(err) {
         console.log(err);
         res.json({msg: "An error occurred. Please try again."});
     }
@@ -195,7 +188,7 @@ app.post("/login", async (req,res) => {
                 else {
                     if (result) {
                         res.cookie('authToken', SECRET_KEY, { httpOnly: true, secure: true });
-                        res.cookie('userId', email, { httpOnly: true, secure: false }); // Set the userId as the email in a cookie
+                        res.cookie('userId', email, { httpOnly: true, secure: false }); 
                         const url = "<button id='login'><a href='/myaccount'>My Account</a></button>";
                         res.json({login: true, url});
                     }
@@ -231,7 +224,6 @@ app.post('/submiteventdemo', async(req, res) => {
     const date = req.body.sdate;
     const borough = req.body.borough;
     const zipcode = req.body.zipcode;
-    //res.json({ event1: "This is Event 1", event2: "This is Event 2", event3: "This is Event 3"});
 
     if (!date || !borough || !zipcode) {
         return res.status(400).json({ error: 'Missing required parameters' });
@@ -313,7 +305,6 @@ app.post('/submitcontact', (req, res) => {
         }
     });
 });
-
 
 async function upcomingMovies() {
     const options = {
@@ -469,9 +460,6 @@ async function generateMovies(genre) {
   
         const randomMovies = randomIndices.map(index => filteredMovies[index]);
         movielist = randomMovies;
-
-        let movie1, movie2, movie3;
-        // let htmlString = '<div class="displayingmov">';
         const movieNames = [];
         let moviecard;
         randomMovies.forEach(movie => {
@@ -495,41 +483,9 @@ async function generateMovies(genre) {
     }
 };
 
-
-async function findMovie(selectedtitle) {
-    try {
-        // Find the movie in the movielist array by matching the title
-        const filteredMovie = movielist.find(movie => movie.title === selectedtitle);
-        // If no movie is found, handle it appropriately
-        if (!filteredMovie) {
-            console.error("Movie not found:", selectedtitle);
-            return '<p>Movie not found</p>';
-        }
-
-        // Generate the HTML for the selected movie
-        let htmlString = '<div class="displayingmov">';
-        const gentext = stringifyGenres(filteredMovie.genre_ids);
-        htmlString += `
-            <div class="moviesdisplay">
-                <div class="moviePoster5">
-                    <img src="https://image.tmdb.org/t/p/w500${filteredMovie.poster_path}" alt="${filteredMovie.title} Poster">
-                    <div class="movieInfo5">
-                        <h6 class="movieTitle">${filteredMovie.title}</h6>
-                    </div>
-                </div>
-            </div>
-        `;
-        htmlString += '</div>';
-        return htmlString;
-    } catch (error) {
-        console.error("Error finding movie:", error);
-        return '<p>Failed to retrieve movie details</p>';
-    }
-};
-
 app.post('/save-to-profile', async (req, res) => {
     const { event, movie } = req.body;
-    const userId = req.cookies.userId;  // Assuming the user's ID is stored in a cookie
+    const userId = req.cookies.userId; 
 
     if (!userId) {
         return res.status(401).json({ success: false, message: 'User not logged in' });
