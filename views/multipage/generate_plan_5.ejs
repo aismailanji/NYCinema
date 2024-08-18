@@ -38,6 +38,7 @@
 
         if (eventDetails) {
             // save the event details for the myaccount page
+            // save the event details for the myaccount page
             localStorage.setItem('profileEvent', eventDetails);
         }
 
@@ -48,6 +49,7 @@
       document.addEventListener('DOMContentLoaded', () => {
       const eventContainer = document.querySelector('.event-details');
 
+      // retrieve the event data from localStorage
       // retrieve the event data from localStorage
       const savedEvent = localStorage.getItem('selectedEvent');
 
