@@ -34,9 +34,7 @@ const db = new pg.Client({
     host: "localhost",
     database: "nycinema",
     password: "hello123",
-    port: 5432,
-    password: "MaTroy23",
-    port: 5433,
+    port: 5432
 });
 // db.connect();
 db.connect(err => {
