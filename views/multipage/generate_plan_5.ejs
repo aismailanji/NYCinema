@@ -33,18 +33,6 @@
     <%- include('../partials/register.ejs') %>
     <%- include('../partials/footer.ejs') %>
     <script>
-      document.getElementById('nextPage').addEventListener('click', function() {
-        const eventDetails = localStorage.getItem('selectedEvent');
-
-        if (eventDetails) {
-            // save the event details for the myaccount page
-            // save the event details for the myaccount page
-            localStorage.setItem('profileEvent', eventDetails);
-        }
-
-        sessionStorage.setItem('success', 'true');
-        window.location.href = '/';
-      });
 
       document.addEventListener('DOMContentLoaded', () => {
       const eventContainer = document.querySelector('.event-details');
