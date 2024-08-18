@@ -26,12 +26,17 @@ let selectedtitle;
 let movielist;
 let moviesaved;
 
+let movieSelection;
+let movieSelected;
+
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
     database: "nycinema",
     password: "hello123",
     port: 5432,
+    password: "MaTroy23",
+    port: 5433,
 });
 // db.connect();
 db.connect(err => {
@@ -62,41 +67,24 @@ app.get("/generate_plan", (req,res) => {
 });
 
 app.get("/generate_plan_2", async (req, res) => {
-    const url = "<button id='login'><a href='/myaccount'>My Account</a></button>";
-    const { genre, theater } = req.query;  // Extract the genre and theater from the query string
-    const result = await generateMovies(genre);
+    const isLoggedIn = req.cookies.authToken;
+    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
+    res.render("multipage/generate_plan_2.ejs",{url, movieSelection});
 
-    if (result.error) {
-        res.status(500).send(result.error);
-    } else {
-        const { htmlString, movieNames } = result;
-        res.render("multipage/generate_plan_2.ejs", { url, display: htmlString, movie1: movieNames[0], movie2: movieNames[1], movie3: movieNames[2] });
-    }
 });
 
 app.get("/generate_plan_3", (req,res) => {
     const isLoggedIn = req.cookies.authToken;
 
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
-    const { selectedMovieName } = req.query;  // Extract the selected movie name from the query string
-    selectedtitle = selectedMovieName;
+
     res.render("multipage/generate_plan_3.ejs",{url});
-});
-
-app.get("/generate_plan_4", (req,res) => {
-    const isLoggedIn = req.cookies.authToken;
-    const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
-
-
-    res.render("multipage/generate_plan_4.ejs",{url});
 });
 
 app.get("/generate_plan_5", async (req,res) => {
     const isLoggedIn = req.cookies.authToken;
     const url = isLoggedIn ? "<button id='login'><a href='/myaccount'>My Account</a></button>" : "<button id='login'>Sign-in/Sign-up</button>";
-    const display = await findMovie(selectedtitle);
-    moviesaved = display;
-    res.render("multipage/generate_plan_5.ejs",{url, display});
+    res.render("multipage/generate_plan_5.ejs",{url, movieSelected});
 });
 
 
@@ -124,14 +112,33 @@ app.get("/about", (req,res) => {
     res.render("about.ejs",{url});
 });
 
-app.get("/myaccount", (req,res) => {
+app.get("/myaccount", async (req,res) => {
     const isLoggedIn = req.cookies.authToken;
-    const url = "<button id='login'><a href='/logout'>Sign-out</a></button>" 
-    res.render("myaccount.ejs",{url,moviesaved});
+    const url = "<button id='login'><a href='/logout'>Sign-out</a></button>";
+    // const url = "<button id='logout'>Sign-out</a></button>";
+    const userId = req.cookies.userId;  // Assuming the user's ID is stored in a cookie
+
+        try {
+
+        const movieQuery = await db.query("SELECT * FROM user_movies WHERE user_email = $1", [userId]);
+        const eventQuery = await db.query("SELECT * FROM user_events WHERE user_email = $1", [userId]);
+
+        const movies = movieQuery.rows;
+        const events = eventQuery.rows;
+        
+        const numofplans = movieQuery.rowCount;
+
+
+        res.render('myaccount.ejs', { url, movies, events, numofplans });
+    } catch (err) {
+        console.error('Error retrieving data:', err);
+        res.status(500).send('An error occurred while loading your profile.');
+    }
 });
 
 app.get('/logout', (req,res) => {
     res.clearCookie('authToken');
+    res.clearCookie('userId');
     res.redirect('/');
 });
 
@@ -188,9 +195,8 @@ app.post("/login", async (req,res) => {
                 else {
                     if (result) {
                         res.cookie('authToken', SECRET_KEY, { httpOnly: true, secure: true });
-                        console.log("login sucessfull");
+                        res.cookie('userId', email, { httpOnly: true, secure: false }); // Set the userId as the email in a cookie
                         const url = "<button id='login'><a href='/myaccount'>My Account</a></button>";
-                        // res.cookie('loggedIn', 'true', { maxAge: 240000, httpOnly: true }); // 3 days
                         res.json({login: true, url});
                     }
                     else {
@@ -230,10 +236,8 @@ app.post('/submiteventdemo', async(req, res) => {
     if (!date || !borough || !zipcode) {
         return res.status(400).json({ error: 'Missing required parameters' });
     }
-
-    //console.log(`Received parameters: date=${date}, borough=${borough}, zipcode=${zipcode}`);
     
-    // Normalize borough input to match API expected values
+    // normalize borough input to match API expected values
     const boroughMap = {
         'Brooklyn': 'Bk',
         'Bronx': 'Bx',
@@ -241,26 +245,13 @@ app.post('/submiteventdemo', async(req, res) => {
         'Staten Island': 'Si',
         'Queens': 'Qn'
     };
-    const boroughCode = boroughMap[borough] // || 'Bk'; // Default to Brooklyn if unknown
+    const boroughCode = boroughMap[borough]
 
-    // Format the date to MM/dd/yyyy hh:mm aa format
-    // const formattedDate = formatDateForAPI(date);
-
-    // Format the start and end dates
-    //const startDate = formatDateForAPI(date, '12:00 AM');
-    //const endDate = formatDateForAPI(date, '11:59 PM');
-
-    // Create a Date object for the start date
+    // Create a Date object for the start date and end date
     const startDateObj = new Date(date);
-    
-    // Format the start date
     const startDate = formatDateForAPI(startDateObj, '12:00 AM');
 
-    // Add 7 days to the start date to get the end date
     const endDateObj = new Date(startDateObj);
-    //endDateObj.setDate(startDateObj.getDate() + 7);
-    
-    // Format the end date
     const endDate = formatDateForAPI(endDateObj, '11:59 PM');
 
     console.log(`Received formatted parameters: start date=${startDate}, end date=${endDate}, borough=${boroughCode}, zipcode=${zipcode}`);
@@ -280,25 +271,22 @@ app.post('/submiteventdemo', async(req, res) => {
         }
         const events = await response.json();
         
-        // Return the items array
+        // return the items array
         if (events.items && events.items.length > 0) {
             res.json(events.items);
         } else {
-            //res.json([]); // Return an empty array if no items are found
             const sightseeingQuery = 'SELECT name, description, address FROM sightseeing_locations ORDER BY RANDOM() LIMIT 1';
             const { rows } = await db.query(sightseeingQuery);
             if (rows.length > 0) {
-                //res.json(rows);
                 const sightseeingLocation = rows[0];
                 const sightseeingData = {
                     name: sightseeingLocation.name,
                     description: sightseeingLocation.description,
                     address: sightseeingLocation.address,
-                    // Add any other necessary fields here
                 };
-                res.json([sightseeingData]); // Return an array so it matches the event structure
+                res.json([sightseeingData]); // return an array so it matches the event structure
             } else {
-                res.json([]); // Return an empty array if no sightseeing locations are found
+                res.json([]); // return an empty array if no sightseeing locations are found
             }
         }
     } catch (error) {
@@ -306,6 +294,7 @@ app.post('/submiteventdemo', async(req, res) => {
         res.status(500).json({ error: 'Failed to fetch events' });
     }
 });
+
 
 app.post('/submitcontact', (req, res) => {
     const { name, email, message } = req.body;
@@ -339,16 +328,12 @@ async function upcomingMovies() {
     try {
         const response = await axios.request(options);
         const movies = response.data.results;
-        console.log("upcoming movies");
-        console.log(response.data.results);
-        console.log("Total movies fetched:", movies.length); // Debugging info
+ 
 
         const randomIndices = genRandNum(movies.length,12);
 
-        console.log(randomIndices);
         // Get the movies corresponding to the random indices
         const randomMovies = randomIndices.map(index => movies[index]);
-        console.log("Randomly selected movies:", randomMovies); // Debugging info
 
         let htmlString = '<div class="upcomingmovies">';
         randomMovies.forEach(movie => {
@@ -363,8 +348,6 @@ async function upcomingMovies() {
             `;
         });
         htmlString += '</div>';
-
-        // console.log(htmlString);
         return htmlString;
     } catch (error) {
         console.error(error);
@@ -410,6 +393,21 @@ function stringifyGenres(genre_ids) {
     return gentext;
 };
 
+app.post('/generateMovies', async(req, res) => { 
+    const { genre } = req.body;  // Extract the genre from the request body
+
+    const result = await generateMovies(genre);  // Call the function to get the movie data
+
+    if (result.error) {
+        return res.status(500).send(result.error);  // Handle the error case
+    }
+
+
+    const {  movieNames } = result;  // Extract necessary data
+    movieSelection = movieNames;
+    res.json({ movieNames }); 
+});
+
 async function generateMovies(genre) {
     const genreMap = {
         "Action": 28,
@@ -447,43 +445,48 @@ async function generateMovies(genre) {
 
     try {
         const response = await axios.request(options);
-        console.log(response.data.results);
         const movies = response.data.results;
+        let filteredMovies;
 
-        const filteredMovies = movies.filter(movie => movie.genre_ids.includes(selectedGenreId));
+        if(genre == "Random") {
+            filteredMovies = movies;
+        }
+        else {
+            filteredMovies = movies.filter(movie => movie.genre_ids.includes(selectedGenreId));
+        }
 
-        // console.log("Filtered Movies:", filteredMovies);
+        if (filteredMovies.length < 3) {
+            const additionalMoviesNeeded = 3 - filteredMovies.length;
+            const additionalMovies = movies
+                .filter(movie => !filteredMovies.includes(movie)) // Exclude already selected movies
+                .slice(0, additionalMoviesNeeded); // Take only the number of movies needed
+
+            filteredMovies.push(...additionalMovies);
+        }
 
         const randomIndices = genRandNum(filteredMovies.length,3);
 
   
         const randomMovies = randomIndices.map(index => filteredMovies[index]);
         movielist = randomMovies;
-        console.log("Randomly selected movies:", randomMovies); // Debugging info
 
         let movie1, movie2, movie3;
-        let htmlString = '<div class="displayingmov">';
+        // let htmlString = '<div class="displayingmov">';
         const movieNames = [];
+        let moviecard;
         randomMovies.forEach(movie => {
             const gentext = stringifyGenres(movie.genre_ids);
-            movieNames.push(movie.title);
-            htmlString += `
-                <div class="moviesdisplay">
-                    <div class="moviePoster">
-                        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title} Poster">
-                        <div class="movieInfo">
-                            <h6 class="movieTitle">${movie.title}</h6>
-                            <p class="movieGen">${gentext}</p>
-                            <p class="movieDes">${movie.overview}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
+            const posterurl = "https://image.tmdb.org/t/p/w500" + movie.poster_path;
+            moviecard = {
+                title: movie.title,
+                overview: movie.overview,
+                genres: gentext,
+                poster: posterurl
+            };
+            movieNames.push(moviecard);
         });
-        htmlString += '</div>';
 
         return {
-            htmlString,
             movieNames
         };
     } catch (error) {
@@ -497,8 +500,6 @@ async function findMovie(selectedtitle) {
     try {
         // Find the movie in the movielist array by matching the title
         const filteredMovie = movielist.find(movie => movie.title === selectedtitle);
-
-        console.log("the filtermocie", filteredMovie);
         // If no movie is found, handle it appropriately
         if (!filteredMovie) {
             console.error("Movie not found:", selectedtitle);
@@ -519,14 +520,49 @@ async function findMovie(selectedtitle) {
             </div>
         `;
         htmlString += '</div>';
-
-        console.log("the html stuff", htmlString);
         return htmlString;
     } catch (error) {
         console.error("Error finding movie:", error);
         return '<p>Failed to retrieve movie details</p>';
     }
-}
+};
+
+app.post('/save-to-profile', async (req, res) => {
+    const { event, movie } = req.body;
+    const userId = req.cookies.userId;  // Assuming the user's ID is stored in a cookie
+
+    if (!userId) {
+        return res.status(401).json({ success: false, message: 'User not logged in' });
+    }
+
+    try {
+        if (event) {
+            await db.query(
+                "INSERT INTO user_events (event_name, event_description, event_address, event_start, event_end, event_permalink, user_email) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+                [event.name, event.shortDesc, event.address, event.startDate, event.endDate, event.permalink, userId]
+            );
+        }
+
+        if (movie) {
+            await db.query(
+                "INSERT INTO user_movies (movie_title, movie_poster, movie_overview, user_email) VALUES ($1, $2, $3, $4)",
+                [movie.title, movie.poster, movie.overview, userId]
+            );
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error saving to profile:', err);
+        res.status(500).json({ success: false, message: 'Error saving to profile' });
+    }
+});
+
+
+app.post("/storeSelectedMovie", async (req, res) => {
+    const { index } = req.body;
+    movieSelected = movieSelection[index];
+    res.json({movieSelected});
+});
 
 
 app.listen(port, () => {

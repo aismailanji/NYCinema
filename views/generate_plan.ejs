@@ -14,9 +14,10 @@
 
       <label class="h5" style="text-align: center; margin-top: 100px" for="genre">Select desired movie genre</label>
       <select class="button" name="genre" id="genre" style="margin: 1px; text-align: center; width: 150px; ">
-        <option value="Horror">Horror</option>
         <option value="Action">Action</option>
         <option value="Comedy">Comedy</option>
+        <option value="Horror">Horror</option>
+        <option value="Radnom">Random</option>
       </select> 
 
       <button id="nextPage" class="submit" type="button" style="margin: auto; padding: 10px 24px;">Continue!</button>
@@ -77,32 +78,38 @@
       theaterDropdown.style.backgroundColor = '#fff';
       theaterDropdown.style.zIndex = '1000';
 
-      // document.getElementById('nextPage').addEventListener('click', function() {
-      //   console.log("next page thing pressed");
-      // const selectedGenre = document.getElementById('genre').value;
-      // const selectedTheater = document.getElementById('theaterInput').value;
+    const moviedemo = document.getElementById('nextPage');
+    if (moviedemo) {
+        console.log('in movies demo');
+        moviedemo.addEventListener('click', async(event) => {
+            event.preventDefault();
+            console.log('Form submitted');
+            const selectedGenre = document.getElementById('genre').value;
+            const selectedTheater = document.getElementById('theaterInput').value;
+            try {
+                const response = await fetch('/generateMovies', { 
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ genre: selectedGenre })
+                });
 
-      // // Send data using a POST request
-      // fetch('/test_generate_plan_2', {
-      //     method: 'GET',
-      //     headers: {
-      //       'Content-Type': 'application/json'
-      //     },
-      //     // body: JSON.stringify({
-      //     //   genre: selectedGenre,
-      //     //   theater: selectedTheater
-      //     // })
-      // });
-    // });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
 
-    document.getElementById('nextPage').addEventListener('click', function() {
-      const selectedGenre = document.getElementById('genre').value;
-      const selectedTheater = document.getElementById('theaterInput').value;
+                const data = await response.json();
+                console.log(data);
 
+            window.location.href = "/generate_plan_2";
+        }
+       catch(error) {
+            console.error('Error:',error);
+        }
+    });
+    }
 
-      const url = `/generate_plan_2?genre=${encodeURIComponent(selectedGenre)}&theater=${encodeURIComponent(selectedTheater)}`;
-
-          window.location.href = url;
-        });
+    
   </script>
 </body>

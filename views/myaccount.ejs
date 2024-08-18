@@ -2,50 +2,42 @@
 <body style="margin-top: 80px; margin-left: 20px;">
     <%- include('partials/navbar.ejs') %>
 
-    <!-- <h1>HELLO WORLD</h1>
-    <form action="/logout" method="GET" class="login-submit">
-        <button type="submit" id="logout">Logout</button>
-    </form> -->
 
-
-
-<!--
-    <section class="py-5 text-center container" style="margin-top:1px">
-        <div class="row py-lg-5">
-          <div class="col-lg-6 col-md-8 mx-auto">
-            <h1 class="fw-light" style="font-family: Inter;">Welcome to your Account</h1>
-            <p class="lead text-body-secondary" style="font-family: Libre Franklin;">Here is your account page where you can view and/or delete itineraries, and sign out when you're done.</p>
-            <p>
-                <button id="Signout" type="button" style="background-color: #758bfd;" class="btn btn-primary btn-lg px-4 me-md-2">Sign-out</button>
-            </p>
-          </div>
-        </div>
-    </section>
--->
     <section class="text-center">
         <h1 style="font-family: Inter;">My Itineraries</h1>
-<!--
-                <form id="inputForm">
-            <input type="text" id="userInput" placeholder="Enter a date" required>
-            <button type="submit">Search</button>
-        </form>
-        <ul style="margin-left: 22px;" id="dynamicList"></ul>
-        <div class="buttons-space">
-            <button id="deleteButton" class="button-1" style="margin: auto; margin-top:-5px;">Delete Itinerary</button>
-            <button id="viewButton" class="button-1" style="margin: auto; margin-top:-5px;">View Itinerary</button>
-        </div>
--->
-        
-    </section>
 
+    </section>
+    
+    <% for(let y = 0; y < numofplans; y++) { %>
     <div class="outcomes" style="margin-top:1px">
-        <div class="profile-event-details" style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
-            <div style="margin-left: 20px; margin-right: 175px; max-width: 150px;">
-                <%-moviesaved%>   
-            </div>         
-            <!-- Saved event details will appear here -->
+        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+          <div class="movie-details">
+                    
+            <div class="displayingmov">
+                <div class="moviesdisplay">
+                    <div class="moviePoster5">
+                        <img src="<%= movies[y].movie_poster %>" alt="<%= movies[y].movie_title %> Poster">
+                        <div class="movieInfo5">
+                            <h6 class="movieTitle"><%= movies[y].movie_title %></h6>
+                            <p class="movieGen"><%= movies[y].genres %></p>
+                            <p class="movieDes"><%= movies[y].movie_overview %></p>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            </div>
+            <div class="event-details" style="width: 300px; margin-left: -350px;">
+                <div class="event-item">
+                    <h5><%= events[y].event_name %></h5>
+                    <p class="event-description"><%= events[y].event_description %></p>
+                    <p class="event-date">Date and Time: <%= events[y].event_start%> - <%= events[y].event_end%></p>
+                    <p class="event-location"><%= events[y].event_address%></p>
+                    <a href="<%= events[y].event_permalink%>" class="event-link">More Details</a>
+                </div>
+            </div>
         </div>
     </div>
+    <% } %>
 
     <div class="bottom-space"></div>
 

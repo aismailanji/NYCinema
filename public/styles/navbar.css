@@ -26,4 +26,18 @@
     color: #758BFD;
 }
 
+#logout {
+    cursor: pointer;
+    border: 1px solid #251f47;
+    border-radius: 5px;
+    color: #758BFD;
+    background-color: #f8f9FA;
+    width: 150px;
+}
+
+#logout a {
+    text-decoration: none;
+    color: #758BFD;
+}
+
 

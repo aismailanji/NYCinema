@@ -164,6 +164,7 @@ div.movies h1 {
 .movieDes {
     width: 190px;
     font-size: 15px;
+    overflow: hidden;
 }
 
 .activity {

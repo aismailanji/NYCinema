@@ -5,10 +5,20 @@
         <h1 style="font-family: Inter; align-items: center; margin-top: 50px;">Generate My Plan</h1>
       </div>
       <div class="outcomes" style="margin-top: -75px;">
-        <label class="h5" for="activity">Here is your plan for the day out in NYC!</label>
+        <label class="h5" for="activity" style="margin: 3px;">Here is your plan for the day out in NYC!</label>
         <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
           <div class="movie-details">
-            <%-display%>
+                    
+        <div class="displayingmov" style="margin-top: 3px;">
+              <div class="moviesdisplay">
+                  <div class="moviePoster5">
+                      <img src="<%= movieSelected.poster %>" alt="<%= movieSelected.title %> Poster">
+                      <div class="movieInfo5">
+                          <h6 class="movieTitle"><%= movieSelected.title %></h6>
+                      </div>
+                  </div>
+              </div>
+      </div>
           </div>
           <div class="event-details" style="width: 300px; margin-left: -350px;">
   
@@ -27,7 +37,7 @@
         const eventDetails = localStorage.getItem('selectedEvent');
 
         if (eventDetails) {
-            // Save the event details to a specific key for the myaccount page
+            // save the event details for the myaccount page
             localStorage.setItem('profileEvent', eventDetails);
         }
 
@@ -38,7 +48,7 @@
       document.addEventListener('DOMContentLoaded', () => {
       const eventContainer = document.querySelector('.event-details');
 
-      // Retrieve the event data from localStorage
+      // retrieve the event data from localStorage
       const savedEvent = localStorage.getItem('selectedEvent');
 
       if (savedEvent) {
@@ -82,22 +92,48 @@
           eventContainer.appendChild(eventElement);
       }
       });
-    
-      // document.addEventListener('DOMContentLoaded', () => {
-      // const movieContainer = document.querySelector('.movie-details');
 
-      // // Retrieve the movie data from localStorage
-      // const savedMovie = localStorage.getItem('selectedMovieName');
+      document.getElementById('nextPage').addEventListener('click', async() => {
 
-      // if (savedMovie) {
-      //   console.log("saved")
-      //   const movie = JSON.parse(savedMovie);
-      //   movieContainer.textContent = movie;
-      // }
-      // else {
-      //   console.log("error");
-      // }
-      // });
-  
+        //if user is logged in save the info to db
+      if (document.getElementById("login").textContent === "My Account") {
+                // User is logged in, save event and movie details
+                await saveEventAndMovieDetails();
+                window.location.href = '/';
+            } else {
+                // Show login pop-up
+                document.querySelector(".wrap").classList.add("active-popup");
+            }
+
+      });
+
+
+      async function saveEventAndMovieDetails() {
+        const selectedEvent = localStorage.getItem('selectedEvent');
+        const selectedMovie = localStorage.getItem('selectedMovie');
+
+
+        if (selectedEvent && selectedMovie) {
+            try {
+                const saveResponse = await fetch('/save-to-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event: selectedEvent ? JSON.parse(selectedEvent) : null,
+                        movie: selectedMovie ? JSON.parse(selectedMovie) : null
+                    })
+                });
+
+                const saveData = await saveResponse.json();
+                if (!saveData.success) {
+                    console.error("Failed to save plan to profile.");
+                }
+            } catch (error) {
+                console.error('Error saving event and movie details:', error);
+            }
+        }
+    };
+
+
     </script>
 </body>

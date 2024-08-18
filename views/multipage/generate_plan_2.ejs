@@ -9,17 +9,34 @@
         <div class="outcomes" style="margin-top: -75px;">
         <label class="h5" for="activity" style="margin-bottom: 20px;">Here are three movies showing now, select one!</label>
 
-    <%-display%>
+        
+        <div class="displayingmov">
+            <% movieSelection.forEach((movie, index) => { %>
+                <div class="moviesdisplay">
+                    <div class="moviePoster">
+                        <img src="<%= movie.poster %>" alt="<%= movie.title %> Poster">
+                        <div class="movieInfo">
+                            <h6 class="movieTitle"><%= movie.title %></h6>
+                            <p class="movieGen"><%= movie.genres %></p>
+                            <p class="movieDes"><%= movie.overview %></p>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
 
+        
     <select class="button" name="movies" id="movies" style="margin-top: 10px; padding: 10px 24px;">
-        <option value="<%= movie1 %>"><%=movie1%></option>
-        <option value="<%= movie2 %>"><%=movie2%></option>
-        <option value="<%= movie3 %>"><%=movie3%></option>
+        <option value="<%= 0 %>"><%=movieSelection[0].title%></option>
+        <option value="<%= 1 %>"><%=movieSelection[1].title%></option>
+        <option value="<%= 2 %>"><%=movieSelection[2].title%></option>
     </select>  
 
     <button id="nextPage" class="submit" type="button" style="margin: auto; padding: 10px 24px;">Confirm</button>  
 
     </div>
+
+ 
 
     <div class="container" style="height: 10px;">
         
@@ -29,11 +46,33 @@
     <%- include('../partials/footer.ejs') %>
 
     <script>
-        document.getElementById('nextPage').addEventListener('click', function() {
-            const selectedMovieName = document.getElementById('movies').value;
-            console.log("Selected Movie Name:", selectedMovieName);  
-            const url = `/generate_plan_3?selectedMovieName=${encodeURIComponent(selectedMovieName)}`;
-            window.location.href = url;
+        document.getElementById('nextPage').addEventListener('click', async function() {
+            const selectedMovieIndex = document.getElementById('movies').value;
+            console.log("Selected Movie Name:", selectedMovieIndex);  
+
+            try {
+                const response = await fetch('/storeSelectedMovie', { 
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ index: selectedMovieIndex })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Save the selected movie to localStorage
+                localStorage.setItem('selectedMovie', JSON.stringify(data.movieSelected));
+
+                window.location.href = "/generate_plan_3";
+                
+        }
+       catch(error) {
+            console.error('Error:',error);
+        }
 
         });
     </script>
